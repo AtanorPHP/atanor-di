@@ -2,7 +2,11 @@
 declare(strict_types=1);
 namespace Atanor\Di\Container\ServiceLocator;
 
-interface ServiceLocator
+use Atanor\Di\Graph\DependencyGraphAware;
+use Atanor\Di\ObjectBuilding\Construction\ConstructorAware;
+use Atanor\Di\ObjectBuilding\Injection\InjectorAware;
+
+interface ServiceLocator extends ConstructorAware,InjectorAware,DependencyGraphAware
 {
     /**
      * Returns registered service

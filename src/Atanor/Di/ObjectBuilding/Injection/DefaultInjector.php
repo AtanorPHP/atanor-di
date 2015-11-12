@@ -17,24 +17,25 @@ class DefaultInjector implements Injector
     {
         $injectedProperties = [];
         $targetClass = get_class($targetInstance);
-        foreach($dependencyList as $property => $dependency){
+        foreach($dependencyList as $property => $dependencyArray){
             if (in_array($property,$injectedProperties)) continue;
-            if ($this->injectionStrategyManager->hasBestStrategy($targetClass,$property)) {
-                $injectionStrategy = $this->injectionStrategyManager->getBestStrategy($targetClass,$property);
+            foreach ($dependencyArray as $dependency) {
+                if ($this->injectionStrategyManager->hasBestStrategy($targetClass,$property)) {
+                    $injectionStrategy = $this->injectionStrategyManager->getBestStrategy($targetClass,$property);
+                }
+                else {
+                    $injectionStrategy = $this->selectInjectionStrategy($targetInstance,$dependency,$property);
+                }
+                if ( ! $injectionStrategy) {
+                    //@todo throw warning : enable to find a suitable injection strategy for current dependency
+                    continue;
+                }
+                $propertyName = $injectionStrategy->inject($targetInstance,$dependency,$property);
+                $injectedProperties[] = $propertyName;
+                $this->injectionStrategyManager->setBestStrategy($targetClass,$propertyName,$injectionStrategy);
             }
-            else {
-                $injectionStrategy = $this->selectInjectionStrategy($targetInstance,$dependency,$property);
-            }
-            if ( ! $injectionStrategy) {
-                //@todo throw warning : enable to find a suitable injection strategy for current dependency
-                continue;
-            }
-            $propertyName = $injectionStrategy->inject($targetInstance,$dependency,$property);
-            $injectedProperties[] = $propertyName;
-            $this->injectionStrategyManager->setBestStrategy($targetClass,$propertyName,$injectionStrategy);
-            return true;
         }
-        return false;
+        return true;
     }
 
     /**

@@ -2,11 +2,14 @@
 declare(strict_types=1);
 namespace Atanor\Di\ObjectBuilding\Injection;
 
+use Atanor\Di\ObjectBuilding\Injection\Strategy\AdderStrategy;
+use Atanor\Di\ObjectBuilding\Injection\Strategy\SetterStrategy;
+
 class InjectionStrategyManager
 {
     /**
      * List of injection strategy
-     * @var array
+     * @var array|\Traversable
      */
     protected $injectionsStrategies = [];
 
@@ -30,7 +33,7 @@ class InjectionStrategyManager
      * @param int $priority
      * @return InjectionStrategyManager
      */
-    public function addInjectionStrategy(InjectionStrategy &$strategy,int $priority = 0):InjectionStrategyManager
+    public function addToInjectionsStrategies(InjectionStrategy &$strategy,int $priority = 0):InjectionStrategyManager
     {
         $this->injectionsStrategies[] = [$strategy,$priority];
         return $this;

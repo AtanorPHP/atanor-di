@@ -4,9 +4,12 @@ declare(strict_types = 1);
 namespace Atanor\Di\Graph\Edge;
 
 use Atanor\Graph\Edge\DefaultArrow;
+use Atanor\Graph\Edge\MutableEdge;
 
-class PropertyEdge extends DefaultArrow implements DependencyEdge
+class PropertyEdge extends DefaultArrow implements DependencyEdge,MutableEdge
 {
+    const OPTION_PROPERTY = 'property';
+
     /**
      * @var string
      */
@@ -22,11 +25,15 @@ class PropertyEdge extends DefaultArrow implements DependencyEdge
     }
 
     /**
-     * Set property name
-     * @param string $propertyName
+     * @inheritDoc
      */
-    public function setPropertyName(string $propertyName):PropertyEdge
+    public function setOptions($options):MutableEdge
     {
-        $this->propertyName = $propertyName;
+        if (isset($options[static::OPTION_PROPERTY])) {
+            $this->propertyName = $options[static::OPTION_PROPERTY];
+        }
+        return $this;
     }
+
+
 }

@@ -38,8 +38,8 @@ class DefaultDependencyGraph extends AbstractGraph implements DependencyGraph
     {
         $dependencies = [];
         foreach($this->edges as $edge) {
-            if ( ! $edge->getTail() === $node) continue;
-            $dependencies[] = &$edge->getHead();
+            if ($edge->getTail() !== $node) continue;
+            $dependencies[] = $edge;
         }
         return $dependencies;
     }

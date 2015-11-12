@@ -4,6 +4,7 @@ namespace Atanor\Di\Graph;
 
 use Atanor\Di\Graph\Edge\ConstructorParamEdge;
 use Atanor\Di\Graph\Edge\DefaultDependencyEdge;
+use Atanor\Di\Graph\Edge\DependencyEdgeFactory;
 use Atanor\Di\Graph\Edge\PropertyEdge;
 use Atanor\Di\Graph\Node\InstanceNode;
 use Atanor\Di\Graph\Node\InstanceNodeFactory;
@@ -14,6 +15,9 @@ class DependencyGraphFactory
     const OPTION_GRAPH_CLASS = 'graphClass';
     const OPTION_NODES = 'nodes';
     const OPTION_NODES_DEPENDENCIES = 'dependencies';
+    const OPTION_NODES_DEPENDENCY_NODE = 'dependencyNode';
+    const OPTION_NODES_EDGE_CONFIG = 'edge';
+
     const OPTION_NODES_CONSTRUCTOR_PARAMS = 'constructorParams';
 
     /**
@@ -22,11 +26,26 @@ class DependencyGraphFactory
     protected $instanceNodeFactory;
 
     /**
+     * @var DependencyEdgeFactory
+     */
+    protected $dependencyEdgeFactory;
+
+    /**
      * @param InstanceNodeFactory $instanceNodeFactory
      */
     public function setInstanceNodeFactory(InstanceNodeFactory $instanceNodeFactory):DependencyGraphFactory
     {
         $this->instanceNodeFactory = $instanceNodeFactory;
+        return $this;
+    }
+
+    /**
+     * @param DependencyEdgeFactory $dependencyEdgeFactory
+     * @return DependencyGraphFactory
+     */
+    public function setDependencyEdgeFactory(DependencyEdgeFactory $dependencyEdgeFactory):DependencyGraphFactory
+    {
+        $this->dependencyEdgeFactory = $dependencyEdgeFactory;
         return $this;
     }
 
@@ -42,6 +61,7 @@ class DependencyGraphFactory
         $dependencyGraph = new $graphClass();
         foreach($config[static::OPTION_NODES] as $nodeConfig) {
             $instanceNode = $this->getInstanceNode($nodeConfig);
+            $dependencyGraph->addInstanceNode($instanceNode);
             $this->setDependencies($instanceNode,$nodeConfig,$dependencyGraph)
                  ->setConstructorParams($instanceNode,$nodeConfig,$dependencyGraph);
         }
@@ -78,21 +98,19 @@ class DependencyGraphFactory
     protected function setDependencies(InstanceNode $node, $nodeConfig, DependencyGraph $graph):DependencyGraphFactory
     {
         if ( ! isset($nodeConfig[static::OPTION_NODES_DEPENDENCIES])) return $this;
-        foreach($nodeConfig[static::OPTION_NODES_DEPENDENCIES] as $propertyName => $dependencyNodeConfig) {
+        $dependenciesConfig = $nodeConfig[static::OPTION_NODES_DEPENDENCIES];
+
+        foreach($dependenciesConfig as $dependencyConfig){
+            $dependencyNodeConfig = $dependencyConfig[static::OPTION_NODES_DEPENDENCY_NODE];
             $dependencyNode = $this->getDependencyNodeFromNodeConfig($dependencyNodeConfig,$graph);
-            if ( ! is_numeric($propertyName)) {
-                $edge = new DefaultDependencyEdge($node,$dependencyNode);
-            }
-            else {
-                $edge = new PropertyEdge($node,$dependencyNode);
-                $edge->setPropertyName($propertyName);
-            }
+            $edgeConfig = $dependencyConfig[static::OPTION_NODES_EDGE_CONFIG];
+            $edge = $this->dependencyEdgeFactory->buildEdge($edgeConfig,$node,$dependencyNode);
             $graph->addDependency($edge);
         }
         return $this;
     }
     /**
-     * Set nconstructor paremeters
+     * Set constructor paremeters
      * @param InstanceNode $node
      * @param $nodeConfig
      * @param DependencyGraph $graph
@@ -133,6 +151,8 @@ class DependencyGraphFactory
         }
         $dependencyNode = $this->getInstanceNode($dependencyNodeConfig);
         $graph->addInstanceNode($dependencyNode);
+        $this->setDependencies($dependencyNode,$dependencyNodeConfig,$graph);
+        $this->setConstructorParams($dependencyNode,$dependencyNodeConfig,$graph);
         return $dependencyNode;
     }
 }
