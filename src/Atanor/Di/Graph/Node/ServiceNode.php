@@ -19,7 +19,6 @@ class ServiceNode extends AbstractInstanceNode implements MutableInstanceNode,Se
      */
     public function setOptions($config):MutableInstanceNode
     {
-        $this->setTypeHint($config);
         $this->setServiceName($config);
         return $this;
     }

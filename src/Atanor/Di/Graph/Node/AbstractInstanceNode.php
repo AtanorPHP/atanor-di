@@ -62,10 +62,9 @@ abstract class AbstractInstanceNode implements InstanceNode
      * Set type int
      * @param array|\ArrayAccess $config
      */
-    public function setTypeHint($config):InstanceNode
+    public function setTypeHint($typeHint):InstanceNode
     {
-        if ( ! isset($config[static::OPTION_TYPE_HINT])) return $this;
-        $this->typeHint = $config[static::OPTION_TYPE_HINT];
+        $this->typeHint = $typeHint;
         return $this;
     }
 

@@ -3,8 +3,6 @@ namespace Atanor\Di\Graph\Node;
 
 interface InstanceNode
 {
-    const OPTION_TYPE_HINT = 'type';
-
     /**
      * Returns instance node type hint or className
      * @return string

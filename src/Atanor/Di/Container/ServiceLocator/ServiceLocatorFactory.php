@@ -7,6 +7,7 @@ use Atanor\Di\Container\Container;
 use Atanor\Di\Graph\DependencyGraphAware;
 use Atanor\Di\ObjectBuilding\Construction\BasicConstructor;
 use Atanor\Di\ObjectBuilding\Injection\MinimalInjector;
+use Atanor\Di\Configuration\Container\ContainerFactoryConfiguration as containerConfig;
 
 class ServiceLocatorFactory extends AbstractContainerFactory
 {
@@ -15,7 +16,7 @@ class ServiceLocatorFactory extends AbstractContainerFactory
      */
     protected function initContainer($config):Container
     {
-        $containerClass = $config[static::OPTION_CONTAINER_CLASS];
+        $containerClass = $config[containerConfig::OPTION_CONTAINER_CLASS];
         $container = new $containerClass();
         if ( ! $container instanceof ServiceLocator) {
             throw new \Exception("This factory can build ServiceLocator only");
@@ -47,10 +48,8 @@ class ServiceLocatorFactory extends AbstractContainerFactory
      */
     protected function setDependencyGraph(DependencyGraphAware $container,$config)
     {
-        $graphConfig = $config[static::OPTION_DEPENDENCY_GRAPH];
+        $graphConfig = $config[containerConfig::OPTION_GRAPH_CONFIGURATION];
         $dependencyGraph = $this->dependencyGraphFactory->buildDependencyGraph($graphConfig);
         $container->setDependencyGraph($dependencyGraph);
     }
-
-
 }
