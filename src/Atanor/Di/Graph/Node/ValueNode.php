@@ -2,17 +2,21 @@
 declare(strict_types = 1);
 namespace Atanor\Di\Graph\Node;
 
-use Atanor\Di\Graph\InstanceNode;
-use Atanor\Di\Graph\Node\Feature\MutableInstanceNode;
-
-class ValueNode implements InstanceNode,MutableInstanceNode
+class ValueNode implements InstanceNode
 {
-    const OPTION_VALUE = 'value';
-
     /**
      * @var mixed
      */
     protected $value;
+
+    /**
+     * ValueNode constructor.
+     * @param mixed $value
+     */
+    public function __construct($value)
+    {
+        $this->value = $value;
+    }
 
     /**
      * @inheritDoc
@@ -45,13 +49,5 @@ class ValueNode implements InstanceNode,MutableInstanceNode
     public function setInstance(&$instance):InstanceNode
     {
         return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setOptions($config):MutableInstanceNode
-    {
-        $this->value = $config[static::OPTION_VALUE];
     }
 }

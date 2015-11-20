@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Atanor\Di\Graph\Node;
 
-use Atanor\Di\Graph\Node\Feature\NodeIdProvider;
+use Atanor\Graph\Node\NodeIdProvider;
 
 class StubInstanceNode implements InstanceNode,NodeIdProvider
 {
@@ -56,12 +56,8 @@ class StubInstanceNode implements InstanceNode,NodeIdProvider
     /**
      * @inheritDoc
      */
-    public function getId():string
+    public function getNodeId():string
     {
         return $this->id;
     }
-
-
-
-
 }

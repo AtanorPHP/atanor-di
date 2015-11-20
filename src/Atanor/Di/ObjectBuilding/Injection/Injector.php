@@ -9,7 +9,12 @@ interface Injector
      * Returns true if inejction was ok.
      * @param mixed $targetInstance
      * @param \ArrayAccess|\Traversable|array $dependencyList
-     * @return bool
+     * @return mixed
      */
-    public function inject(&$targetInstance,$dependencyList):bool;
+    public function inject(&$targetInstance,$dependencyList);
+
+    /**
+     * Injector constructor.
+     */
+    public function __construct();
 }

@@ -1,15 +1,26 @@
 <?php
 namespace Atanor\Di\ObjectBuilding\Injection\Strategy;
 
-use Atanor\Di\ObjectBuilding\Injection\InjectionStrategy;
+use Atanor\Di\Exception\DependencyNotInjectable;
+use Atanor\Di\ObjectBuilding\Injection\Dependency\Dependency;
+use Atanor\Di\ObjectBuilding\Injection\Dependency\PropertyDependency;
 
 class SetterStrategy implements InjectionStrategy
 {
     /**
      * @inheritdoc
      */
-    public function canInject($instance, $dependency,string $propertyName = null):bool
+    public function __construct()
     {
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canInject(&$instance,Dependency $dependency):bool
+    {
+        if ( ! $dependency instanceof PropertyDependency) return false;
+        $propertyName = $dependency->getPropertyName();
         $setterName = $this->getSetterName($instance,$propertyName);
         if (empty($setterName)) return false;
         return true;
@@ -18,11 +29,18 @@ class SetterStrategy implements InjectionStrategy
     /**
      * @inheritdoc
      */
-    public function inject(&$instance, $dependency,string $propertyName = null):string
+    public function inject(&$instance,Dependency $dependency)
     {
+        if ( ! $this->canInject($instance,$dependency)) {
+            throw new DependencyNotInjectable();
+        }
+        $propertyName = $dependency->getPropertyName();
         $setterName = $this->getSetterName($instance,$propertyName);
-        $instance->$setterName($dependency);
-        return $propertyName;
+        try {
+            $instance->$setterName($dependency->getValue());
+        } catch (\Exception $e) {
+            throw new DependencyNotInjectable();
+        }
     }
 
     /**
@@ -37,6 +55,4 @@ class SetterStrategy implements InjectionStrategy
         if ( ! method_exists($instance,$setterName)) return '';
         return $setterName;
     }
-
-
 }

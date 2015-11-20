@@ -4,10 +4,9 @@ declare(strict_types = 1);
 namespace Atanor\Di\Graph;
 
 use Atanor\Di\Graph\Edge\DependencyEdge;
-use Atanor\Graph\Graph\Graph;
 use Atanor\Di\Graph\Node\InstanceNode;
 
-interface DependencyGraph extends Graph
+interface DependencyGraph
 {
     /**
      * Add instance node
@@ -17,11 +16,20 @@ interface DependencyGraph extends Graph
     public function addInstanceNode(InstanceNode $node):DependencyGraph;
 
     /**
-     * Add dependency
-     * @param DependencyEdge $dependencyEdge
+     * Add a dependency adge
+     * @param DependencyEdge $edge
      * @return DependencyGraph
      */
-    public function addDependency(DependencyEdge $dependencyEdge):DependencyGraph;
+    public function addDependency(DependencyEdge $edge):DependencyGraph;
+
+    /**
+     * @param string $nodeId
+     * @param string $nodeId2
+     * @param string $propertyName
+     * @param string $edgeClass
+     * @return DependencyGraph
+     */
+    public function addPropertyDependency(string $nodeId,string $nodeId2,string $propertyName,string $edgeClass):DependencyGraph;
 
     /**
      * Get all dependencies
@@ -29,12 +37,4 @@ interface DependencyGraph extends Graph
      * @return mixed
      */
     public function getDependencies(InstanceNode $node):array;
-
-    /**
-     * @param string $name
-     * @return bool
-     */
-    public function hasService(string $name):bool;
-
-
 }

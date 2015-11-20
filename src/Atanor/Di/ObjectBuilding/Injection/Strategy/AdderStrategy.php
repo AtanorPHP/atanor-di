@@ -2,16 +2,26 @@
 declare(strict_types = 1);
 namespace Atanor\Di\ObjectBuilding\Injection\Strategy;
 
-use Atanor\Di\ObjectBuilding\Injection\InjectionStrategy;
+use Atanor\Di\ObjectBuilding\Injection\Dependency\Dependency;
+use Atanor\Di\ObjectBuilding\Injection\Dependency\PropertyDependency;
+use Atanor\Di\Exception\DependencyNotInjectable;
 
 class AdderStrategy implements InjectionStrategy
 {
     /**
+     * @inheritdoc
+     */
+    public function __construct()
+    {
+    }
+
+    /**
      * @inheritDoc
      */
-    public function canInject($instance, $dependency, string $propertyName = null):bool
+    public function canInject(&$insatnce,Dependency $dependency):bool
     {
-        $adderName = $this->getAdderName($instance,$propertyName);
+        if ( ! $dependency instanceof PropertyDependency) return false;
+        $adderName = $this->getAdderName($insatnce,$dependency->getPropertyName());
         if (empty($adderName)) return false;
         return true;
     }
@@ -19,13 +29,21 @@ class AdderStrategy implements InjectionStrategy
     /**
      * @inheritDoc
      */
-    public function inject(&$instance, $dependency, string $propertyName = null):string
+    public function inject(&$instance,Dependency $dependency)
     {
-        $adderName = $this->getAdderName($instance,$propertyName);
-        $instance->$adderName($dependency);
-        return $propertyName;
+        if ( ! $this->canInject($instance,$dependency)) {
+            throw new DependencyNotInjectable();
+        }
+        $adderName = $this->getAdderName($instance,$dependency->getPropertyName());
+        $instance->$adderName($dependency->getValue());
     }
 
+    /**
+     * Returns potential adder method name
+     * @param $instance
+     * @param $propertyName
+     * @return string
+     */
     protected function getAdderName($instance,$propertyName)
     {
         $adderName = 'addTo' . ucfirst($propertyName);

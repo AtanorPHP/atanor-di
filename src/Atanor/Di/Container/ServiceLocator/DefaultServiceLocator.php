@@ -3,28 +3,15 @@ declare(strict_types = 1);
 namespace Atanor\Di\Container\ServiceLocator;
 
 use Atanor\Di\Container\AbstractContainer;
-use Atanor\Di\Container\Container;
-use Atanor\Di\Graph\DependencyGraph;
-use Atanor\Di\Graph\Edge\ConstructorParamEdge;
-use Atanor\Di\Graph\Edge\DependencyEdge;
 use Atanor\Di\Graph\Edge\PropertyEdge;
 use Atanor\Di\Graph\Node\Feature\Service;
 use Atanor\Di\Graph\Node\InstanceNode;
-use Atanor\Di\ObjectBuilding\Construction\BasicConstructor;
-use Atanor\Di\ObjectBuilding\Construction\Constructor;
-use Atanor\Di\ObjectBuilding\Injection\DefaultInjector;
-use Atanor\Di\ObjectBuilding\Injection\Injector;
+use Atanor\Di\Graph\Node\ServiceNode;
 
 class DefaultServiceLocator extends AbstractContainer implements ServiceLocator
 {
-    /**
-     * DefaultServiceLocator constructor.
-     */
-    public function __construct()
-    {
-        $this->constructor = new BasicConstructor();
-        $this->injector = new DefaultInjector();
-    }
+    protected $defaultServiceNodeClass = ServiceNode::class;
+    protected $defaultPropertyEdgeClass = PropertyEdge::class;
 
     /**
      * @inheritDoc
@@ -53,6 +40,29 @@ class DefaultServiceLocator extends AbstractContainer implements ServiceLocator
      */
     public function hasRegisteredService(string $name):bool
     {
-        return $this->dependencyGraph->hasService($name);
+        return $this->dependencyGraph->containsNodeId($name);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function registerService(string $name, string $typeHint, string $serviceNodeClass = null):ServiceLocator
+    {
+        if ($serviceNodeClass == null) $serviceNodeClass = $this->defaultServiceNodeClass;
+        $serviceNode = new $serviceNodeClass($name,$typeHint);
+        $this->dependencyGraph->addInstanceNode($serviceNode);
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function addServicePropertyDependency(string $serviceName,string $dependencyServiceName,string $propertyName,string $edgeClass = null):ServiceLocator
+    {
+        if ( ! $edgeClass) $edgeClass = $this->defaultPropertyEdgeClass;
+        $this->dependencyGraph->addPropertyDependency($serviceName,$dependencyServiceName,$propertyName,$edgeClass);
+        return $this;
+    }
+
+
 }

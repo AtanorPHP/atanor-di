@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace Atanor\Di\Container;
 
+use Atanor\Di\Graph\Edge\DependencyEdge;
 use Atanor\Di\Graph\Node\InstanceNode;
 
 interface Container

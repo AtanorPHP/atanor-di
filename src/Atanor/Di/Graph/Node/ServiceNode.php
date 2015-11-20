@@ -3,10 +3,9 @@ declare(strict_types = 1);
 
 namespace Atanor\Di\Graph\Node;
 
-use Atanor\Di\Graph\Node\Feature\MutableInstanceNode;
 use Atanor\Di\Graph\Node\Feature\Service;
 
-class ServiceNode extends AbstractInstanceNode implements MutableInstanceNode,Service
+class ServiceNode extends AbstractInstanceNode implements Service
 {
     /**
      * Service name
@@ -15,24 +14,12 @@ class ServiceNode extends AbstractInstanceNode implements MutableInstanceNode,Se
     protected $name;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
-    public function setOptions($config):MutableInstanceNode
+    public function __construct(string $name,string $typeHint)
     {
-        $this->setServiceName($config);
-        return $this;
-    }
-
-    /**
-     * Set servie name from config
-     * @param array|\ArrayAccess $config
-     * @return ServiceNode
-     */
-    protected function setServiceName($config):ServiceNode
-    {
-        if ( ! isset($config[static::OPTION_SERVICE_NAME])) return $this;
-        $this->name = $config[static::OPTION_SERVICE_NAME];
-        return $this;
+        $this->name = $name;
+        $this->typeHint = $typeHint;
     }
 
     /**
@@ -46,8 +33,8 @@ class ServiceNode extends AbstractInstanceNode implements MutableInstanceNode,Se
     /**
      * @inheritDoc
      */
-    public function getId():string
+    public function getNodeId():string
     {
-        return $this->name;
+        return $this->getName();
     }
 }

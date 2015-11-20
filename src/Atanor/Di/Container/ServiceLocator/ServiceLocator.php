@@ -2,11 +2,7 @@
 declare(strict_types=1);
 namespace Atanor\Di\Container\ServiceLocator;
 
-use Atanor\Di\Graph\DependencyGraphAware;
-use Atanor\Di\ObjectBuilding\Construction\ConstructorAware;
-use Atanor\Di\ObjectBuilding\Injection\InjectorAware;
-
-interface ServiceLocator extends ConstructorAware,InjectorAware,DependencyGraphAware
+interface ServiceLocator
 {
     /**
      * Returns registered service
@@ -28,4 +24,23 @@ interface ServiceLocator extends ConstructorAware,InjectorAware,DependencyGraphA
      * @return bool
      */
     public function hasRegisteredService(string $name):bool;
+
+    /**
+     * @param string $name
+     * @param string $typeHint
+     * @param string|null $serviceNodeClass
+     * @return ServiceLocator
+     */
+    public function registerService(string $name,string $typeHint,string $serviceNodeClass = null):ServiceLocator;
+
+    /**
+     * Add property dependency edge between two services
+     * @param string $serviceName
+     * @param string $dependencyServiceName
+     * @param string $property
+     * @param string|null $edgeClass
+     * @return ServiceLocator
+     */
+    public function addServicePropertyDependency(string $serviceName,string $dependencyServiceName,string $property,string $edgeClass = null):ServiceLocator;
+
 }

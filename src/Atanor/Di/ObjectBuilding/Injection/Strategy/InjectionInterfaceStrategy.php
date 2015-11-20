@@ -2,18 +2,19 @@
 declare(strict_types = 1);
 namespace Atanor\Di\ObjectBuilding\Injection\Strategy;
 
-use Atanor\Di\ObjectBuilding\Injection\InjectionStrategy;
+use Atanor\Di\ObjectBuilding\Injection\Dependency\Dependency;
+use Atanor\Di\Exception\DependencyNotInjectable;
 
 class InjectionInterfaceStrategy implements InjectionStrategy
 {
     /**
      * @inheritDoc
      */
-    public function canInject($instance, $dependency,string $propertyName = null):bool
+    public function canInject(&$instance,Dependency $dependency):bool
     {
-        foreach($this->getDependencyInterfaces($dependency) as $interface) {
+        foreach($this->getDependencyInterfaces($dependency->getValue()) as $interface) {
             $injectionInterfaceName = $interface . 'Aware';
-            if (is_subclass_of($instance,$injectionInterfaceName)) return true;
+            if (is_subclass_of($dependency->getValue(),$injectionInterfaceName)) return true;
         }
         return false;
     }
@@ -21,26 +22,33 @@ class InjectionInterfaceStrategy implements InjectionStrategy
     /**
      * @inheritDoc
      */
-    public function inject(&$instance, $dependency,string $propertyName = null):string
+    public function inject(&$instance,Dependency $dependency)
     {
+        if ( ! $this->canInject($instance,$dependency)) {
+            throw new DependencyNotInjectable();
+        }
         foreach($this->getDependencyInterfaces($dependency) as $interface) {
             $injectionInterfaceName = $interface . 'Aware';
             if ( ! is_subclass_of($instance,$injectionInterfaceName)) continue;
             $setterName = 'set' . $interface;
             if ( ! method_exists($instance,$setterName)) {
-                throw new \Exception("$setterName is not implemented");
+                throw new DependencyNotInjectable("$setterName does not exists.");
             }
-            $instance->$setterName($dependency);
-            return ''; //@todo...
+            $instance->$setterName($dependency->getValue());
         }
-        throw new \Exception("No suitable injection interface implemented");
+        throw new DependencyNotInjectable();
     }
 
-    protected function getDependencyInterfaces($dependency):array
+    /**
+     * Returns a list of interfaces implemented by instance
+     * @param $instance
+     * @return array
+     */
+    protected function getDependencyInterfaces($instance):array
     {
-        $interfaces = class_implements($dependency);
-        array_push($interfaces,get_class($dependency));
-        $interfaces += class_parents($dependency);
+        $interfaces = class_implements($instance);
+        array_push($interfaces,get_class($instance));
+        $interfaces += class_parents($instance);
         return $interfaces;
     }
 
