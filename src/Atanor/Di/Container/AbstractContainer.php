@@ -2,24 +2,25 @@
 declare(strict_types = 1);
 namespace Atanor\Di\Container;
 
-use Atanor\Di\Graph\DefaultDependencyGraph;
-use Atanor\Di\Graph\DependencyGraph;
-use Atanor\Di\Graph\Node\ValueNode;
+use Atanor\Di\Graph\DefaultAvatarGraph;
+use Atanor\Di\Graph\AvatarGraph;
+use Atanor\Di\Graph\Avatar\ValueAvatar;
+use Atanor\Di\ObjectBuilding\Construction\BootableConstructor;
 use Atanor\Di\ObjectBuilding\Construction\Constructor;
 use Atanor\Di\ObjectBuilding\Construction\ReflectionConstructor;
 use Atanor\Di\ObjectBuilding\Injection\BootableInjector;
 use Atanor\Di\ObjectBuilding\Injection\Dependency\Dependency;
 use Atanor\Di\ObjectBuilding\Injection\Dependency\PropertyDependency;
 use Atanor\Di\ObjectBuilding\Injection\Injector;
-use Atanor\Di\Graph\Node\InstanceNode;
-use Atanor\Di\Graph\Edge\DependencyEdge;
-use Atanor\Di\Graph\Edge\ConstructorParamEdge;
-use Atanor\Di\Graph\Edge\PropertyEdge;
+use Atanor\Di\Graph\Avatar\Avatar;
+use Atanor\Di\Graph\Bond\Bond;
+use Atanor\Di\Graph\Bond\ConstructorBond;
+use Atanor\Di\Graph\Bond\PropertyBond;
 
-class AbstractContainer implements Container
+class AbstractContainer implements Container,MutableContainer,BootableContainer
 {
     /**
-     * @var DependencyGraph
+     * @var AvatarGraph
      */
     protected $dependencyGraph;
 
@@ -39,72 +40,80 @@ class AbstractContainer implements Container
      * True if container has been initiated
      * @var bool
      */
-    protected $isInitiated = false;
-
-    /**
-     * @var string
-     */
-    protected $defaultPropertyEdgeClass = PropertyEdge::class;
+    protected $isBooted = false;
 
     /**
      * AbstractContainer constructor.
      */
     public function __construct()
     {
-        $this->dependencyGraph = new DefaultDependencyGraph();
+        $this->dependencyGraph = new DefaultAvatarGraph();
         $this->constructor = new ReflectionConstructor();
     }
 
-
-    public function init()
+    /**
+     * @inheritdoc
+     */
+    public function isBooted():bool
     {
-        $this->bootInjector();
-        //$this->bootConstructor();
-        $this->isInitiated = true;
+        return $this->isBooted;
     }
 
-    protected function bootConstructor()
+    /**
+     * @inheritdoc
+     */
+    public function boot():BootableContainer
+    {
+        $this->bootConstructor();
+        $this->bootInjector();
+        $this->isBooted = true;
+        return $this;
+    }
+
+    /**
+     * Boot constructor
+     * @return Container
+     */
+    protected function bootConstructor():Container
     {
         $constructorNode = $this->dependencyGraph->getNode('constructor');
         $constructorClass = $constructorNode->getTypeHint();
         $this->constructor = new $constructorClass();
+        if ($this->constructor instanceof BootableConstructor) {
+            $dependencies = $this->dependencyGraph->getDependencyObjects($constructorNode,[$this,'instantiationCallbackForBoot']);
+            $this->constructor->boot($dependencies);
+        }
+        return $this;
     }
 
     /**
-     * Boot injector.
-     * Will consider any dependencies of injector if they have no other dependencies and
-     * are constructed with no parameter
-     * @return $this
+     * Method used to instantiate a
+     * @param Avatar $node
+     * @return mixed
      */
-    protected function bootInjector()
+    public function instantiationCallbackForBoot(Avatar $node)
+    {
+        if ($node instanceof ValueAvatar) return $node->getInstance();
+        else  {
+            if ($this->dependencyGraph->hasDependencies($node)) {
+                //Throw exception : cannot use injector dependency having dependencies.
+            }
+            $dependencyClass = $node->getTypeHint();
+            return new $dependencyClass();
+        }
+    }
+
+    /**
+     * Boot injector
+     * @return Container
+     */
+    protected function bootInjector():Container
     {
         $injectorNode = $this->dependencyGraph->getNode('injector');
         $injectorClass = $injectorNode->getTypeHint();
         $this->injector = new $injectorClass();
         if ($this->injector instanceof BootableInjector) {
-            $dependencies = [];
-            foreach($this->dependencyGraph->getDependencies($injectorNode) as $edge) {
-                if ($edge instanceof ConstructorParamEdge) continue;
-                $dependencyNode = $edge->getHead();
-                if ($dependencyNode instanceof ValueNode) {
-                    $value = $dependencyNode->getInstance();
-                }
-                $instanceClass = $dependencyNode->getTypeHint();
-                try {
-                    $value = new $instanceClass();
-                } catch (\Exception $e) {
-                    continue;
-                    //@todo : throw execption
-                }
-                if ($edge instanceof PropertyEdge) {
-                    $propertyName = $edge->getPropertyName();
-                    $dependency = new PropertyDependency($propertyName,$value);
-                }
-                else {
-                    $dependency = new Dependency($value);
-                }
-                $dependencies[] = $dependency;
-            }
+            $dependencies = $this->dependencyGraph->getDependencyObjects($injectorNode,[$this,'instantiationCallbackForBoot']);
             $this->injector->boot($dependencies);
         }
         return $this;
@@ -113,24 +122,25 @@ class AbstractContainer implements Container
     /**
      * @inheritDoc
      */
-    public function build(InstanceNode $node)
+    public function build(Avatar $node)
     {
-        if ( ! $this->isInitiated) {
+        if ( ! $this->isBooted) {
             //trhow exception
         }
-        if ($node->isInstantiated()) return $node->getInstance();
+        if ($node->isMaterialized()) return $node->getObject();
         $className = $node->getTypeHint();
         $constructorParams = [];
         $dependencies = [];
+        //@todo use dependencyGraph::getDependencyObjects($node)...
         foreach($this->dependencyGraph->getDependencies($node) as $depEdge) {
-            /** @var  DependencyEdge $depEdge */
+            /** @var  Bond $depEdge */
             $dependencyNode = $depEdge->getHead();
             $instance = $this->build($dependencyNode);
-            if ($depEdge instanceof ConstructorParamEdge) {
+            if ($depEdge instanceof ConstructorBond) {
                 $constructorParams[$depEdge->getPosition()] = $instance;
                 continue;
             }
-            if ($depEdge instanceof PropertyEdge) {
+            if ($depEdge instanceof PropertyBond) {
                 $propertyName = $depEdge->getPropertyName();
                 $dependency = new PropertyDependency($propertyName,$instance);
             }
@@ -142,7 +152,27 @@ class AbstractContainer implements Container
         }
         $instance = $this->constructor->construct($className,$constructorParams);
         if (count($dependencies) > 0) $this->injector->inject($instance,$dependencies);
-        $node->setInstance($instance);
+        $node->setObject($instance);
         return $instance;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function setConstructor(Constructor $constructor):MutableContainer
+    {
+        $this->constructor = $constructor;
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setInjector(Injector $injector):MutableContainer
+    {
+        $this->injector = $injector;
+        return $this;
+    }
+
+
 }

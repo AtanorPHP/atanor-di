@@ -1,6 +1,6 @@
 <?php
 declare(strict_types = 1);
-namespace Atanor\Di\Graph\Node\Feature;
+namespace Atanor\Di\Graph\Avatar\Feature;
 
 use Atanor\Graph\Node\NodeIdProvider;
 

@@ -3,15 +3,15 @@ declare(strict_types = 1);
 namespace Atanor\Di\Container\ServiceLocator;
 
 use Atanor\Di\Container\AbstractContainer;
-use Atanor\Di\Graph\Edge\PropertyEdge;
-use Atanor\Di\Graph\Node\Feature\Service;
-use Atanor\Di\Graph\Node\InstanceNode;
-use Atanor\Di\Graph\Node\ServiceNode;
+use Atanor\Di\Graph\Bond\PropertyBond;
+use Atanor\Di\Graph\Avatar\Feature\IdentityProvider;
+use Atanor\Di\Graph\Avatar\Avatar;
+use Atanor\Di\Graph\Avatar\DefaultServiceAvatar;
 
 class DefaultServiceLocator extends AbstractContainer implements ServiceLocator
 {
-    protected $defaultServiceNodeClass = ServiceNode::class;
-    protected $defaultPropertyEdgeClass = PropertyEdge::class;
+    protected $defaultServiceNodeClass = DefaultServiceAvatar::class;
+    protected $defaultPropertyEdgeClass = PropertyBond::class;
 
     /**
      * @inheritDoc
@@ -21,9 +21,9 @@ class DefaultServiceLocator extends AbstractContainer implements ServiceLocator
         if ( ! $this->hasRegisteredService($name)) {
             throw new \Exception("No registered service named $name");
         }
-        /** @var InstanceNode $dependencyNode */
+        /** @var Avatar $dependencyNode */
         $dependencyNode = $this->dependencyGraph->getNode($name);
-        if ($dependencyNode->isInstantiated()) return $dependencyNode->getInstance();
+        if ($dependencyNode->isMaterialized()) return $dependencyNode->getObject();
         else return $this->build($dependencyNode);
     }
 

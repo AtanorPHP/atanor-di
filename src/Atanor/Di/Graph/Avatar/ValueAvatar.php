@@ -1,8 +1,8 @@
 <?php
 declare(strict_types = 1);
-namespace Atanor\Di\Graph\Node;
+namespace Atanor\Di\Graph\Avatar;
 
-class ValueNode implements InstanceNode
+class ValueAvatar implements Avatar
 {
     /**
      * @var mixed
@@ -10,7 +10,7 @@ class ValueNode implements InstanceNode
     protected $value;
 
     /**
-     * ValueNode constructor.
+     * ValueAvatar constructor.
      * @param mixed $value
      */
     public function __construct($value)
@@ -21,7 +21,7 @@ class ValueNode implements InstanceNode
     /**
      * @inheritDoc
      */
-    public function getTypeHint()
+    public function getObjectType():string
     {
         if (is_object($this->value)) return get_class($this->value);
         return gettype($this->value);
@@ -30,7 +30,7 @@ class ValueNode implements InstanceNode
     /**
      * @inheritDoc
      */
-    public function isInstantiated():bool
+    public function isMaterialized():bool
     {
         return true;
     }
@@ -38,7 +38,7 @@ class ValueNode implements InstanceNode
     /**
      * @inheritDoc
      */
-    public function getInstance()
+    public function getObject()
     {
         return $this->value;
     }
@@ -46,7 +46,7 @@ class ValueNode implements InstanceNode
     /**
      * @inheritDoc
      */
-    public function setInstance(&$instance):InstanceNode
+    public function setObject(&$object):Avatar
     {
         return $this;
     }

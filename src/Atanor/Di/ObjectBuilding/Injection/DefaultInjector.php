@@ -16,9 +16,9 @@ class DefaultInjector implements Injector, BootableInjector
 {
     /**
      * Collection of injectionStrategy
-     * @var \SplPriorityQueue
+     * @var \Traversable|array
      */
-    protected $injectionStrategies;
+    protected $injectionStrategies = [];
 
     /**
      * @var array
@@ -26,11 +26,10 @@ class DefaultInjector implements Injector, BootableInjector
     protected $favoriteInjectionStrategies = [];
 
     /**
-     * DefaultInjector constructor.
+     * @inheritDoc
      */
     public function __construct()
     {
-        $this->injectionStrategies = new \SplPriorityQueue();
     }
 
     /**
@@ -43,7 +42,11 @@ class DefaultInjector implements Injector, BootableInjector
         foreach ($dependencies as $dependency) {
             if ( ! $dependency instanceof PropertyDependency) continue;
             if ( ! $dependency->getValue() instanceof InjectionStrategy) continue;
-            $strategiesToInject[] = $dependency;
+            $value = $dependency->getValue();
+            if ($value instanceof InjectionStrategy) {
+                $this->addToInjectionStrategies($value);
+            }
+            else $strategiesToInject[] = $dependency;
         }
         $this->inject($this,$strategiesToInject);
         return $this;
@@ -55,9 +58,9 @@ class DefaultInjector implements Injector, BootableInjector
      * @param int $priority
      * @return Injector
      */
-    public function addToInjectionStrategies(InjectionStrategy &$injectionStrategy,int $priority = 0):Injector
+    public function addToInjectionStrategies(InjectionStrategy &$injectionStrategy):Injector
     {
-        $this->injectionStrategies->insert($injectionStrategy,$priority);
+        $this->injectionStrategies[] = $injectionStrategy;
         return $this;
     }
 
@@ -157,7 +160,7 @@ class DefaultInjector implements Injector, BootableInjector
      */
     protected function selectInjectionStrategy(&$instance,Dependency $dependency):InjectionStrategy
     {
-        foreach(clone $this->injectionStrategies as $injectionStrategy) {
+        foreach($this->injectionStrategies as $injectionStrategy) {
             /** @var InjectionStrategy $injectionStrategy */
             if ( ! $injectionStrategy->canInject($instance,$dependency)) continue;
             return $injectionStrategy;

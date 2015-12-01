@@ -1,19 +1,17 @@
 <?php
 declare(strict_types = 1);
 
-namespace Atanor\Di\Graph\Node;
+namespace Atanor\Di\Graph\Avatar;
 
-use Atanor\Graph\Node\NodeIdProvider;
+use Atanor\Di\Graph\Avatar\Feature\IdentityProvider;
+use Atanor\Di\Graph\Avatar\Feature\IdentityProviderTrait;
 
-class StubInstanceNode implements InstanceNode,NodeIdProvider
+class StubAvatar implements Avatar,IdentityProvider
 {
-    /**
-     * @var string
-     */
-    protected $id;
+    use IdentityProviderTrait;
 
     /**
-     * StubInstanceNode constructor.
+     * StubAvatar constructor.
      * @param string $id
      */
     public function __construct($id)
@@ -24,7 +22,7 @@ class StubInstanceNode implements InstanceNode,NodeIdProvider
     /**
      * @inheritDoc
      */
-    public function getTypeHint()
+    public function getObjectType():string
     {
         return 'stub';
     }
@@ -32,7 +30,7 @@ class StubInstanceNode implements InstanceNode,NodeIdProvider
     /**
      * @inheritDoc
      */
-    public function isInstantiated():bool
+    public function isMaterialized():bool
     {
         return false;
     }
@@ -40,7 +38,7 @@ class StubInstanceNode implements InstanceNode,NodeIdProvider
     /**
      * @inheritDoc
      */
-    public function getInstance()
+    public function getObject()
     {
         throw new \Exception('You cannot instantiate a stub instance node');
     }
@@ -48,16 +46,8 @@ class StubInstanceNode implements InstanceNode,NodeIdProvider
     /**
      * @inheritDoc
      */
-    public function setInstance(&$instance):InstanceNode
+    public function setObject(&$object):Avatar
     {
         throw new \Exception('You cannot instantiate a stub instance node');
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getNodeId():string
-    {
-        return $this->id;
     }
 }

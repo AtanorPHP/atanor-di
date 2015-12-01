@@ -2,7 +2,9 @@
 declare(strict_types=1);
 namespace Atanor\Di\ObjectBuilding\Construction;
 
-class ConstructorStack implements Constructor
+use Atanor\Di\ObjectBuilding\Injection\Dependency\PropertyDependency;
+
+class ConstructorStack implements Constructor, BootableConstructor
 {
     /**
      * Constructors stack
@@ -26,11 +28,7 @@ class ConstructorStack implements Constructor
                 return $constructor->construct($className,$options);
             }
         }
-        $queue = new \SplPriorityQueue();
-        foreach($this->constructorStack as $item) {
-            $queue->insert($item[1],$item[0]);
-        }
-        foreach($queue as $constructor) {
+        foreach($this->constructorStack as $constructor) {
             if ( ! $constructor->canConstruct($className,$options)) continue;
             $this->setBestConstructor($className,$constructor);
             return $constructor->construct($className,$options);
@@ -43,9 +41,9 @@ class ConstructorStack implements Constructor
      * @param int         $priority
      * @return ConstructorStack
      */
-    public function addConstructor(Constructor &$constructor,int $priority = 0):ConstructorStack
+    public function addToConstructorStack(Constructor &$constructor):ConstructorStack
     {
-        $this->constructorStack[spl_object_hash($constructor)] = [$priority,$constructor];
+        $this->constructorStack[] = $constructor;
         return $this;
     }
 
@@ -87,5 +85,18 @@ class ConstructorStack implements Constructor
     {
         if ( ! $this->hasBestConstructor($className)) return null;
         return $this->bestConstructor[$className];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function boot($dependencies):BootableConstructor
+    {
+        foreach ($dependencies as $dependency) {
+            if ( ! $dependency instanceof PropertyDependency) continue;
+            if ( ! $dependency->getValue() instanceof Constructor) continue;
+            $this->addToConstructorStack($dependency->getValue());
+        }
+        return $this;
     }
 }

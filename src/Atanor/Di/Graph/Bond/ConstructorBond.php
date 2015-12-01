@@ -1,11 +1,11 @@
 <?php
 declare(strict_types = 1);
 
-namespace Atanor\Di\Graph\Edge;
+namespace Atanor\Di\Graph\Bond;
 
 use Atanor\Graph\Edge\DefaultArrow;
 
-class ConstructorParamEdge extends DefaultArrow implements DependencyEdge
+class ConstructorBond extends DefaultBond implements Bond
 {
     /**
      * Constructor parameter position
@@ -26,7 +26,7 @@ class ConstructorParamEdge extends DefaultArrow implements DependencyEdge
      * Set parameter position
      * @param int $position
      */
-    public function setPosition($position):ConstructorParamEdge
+    public function setPosition($position):ConstructorBond
     {
         $this->position = $position;
         return $this;
