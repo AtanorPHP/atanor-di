@@ -12,7 +12,7 @@ use Atanor\Di\ObjectBuilding\Injection\Strategy\InjectionStrategy;
 /**
  * Class DefaultInjector
  */
-class DefaultInjector implements Injector, BootableInjector
+class DefaultInjector implements Injector
 {
     /**
      * Collection of injectionStrategy
@@ -33,32 +33,12 @@ class DefaultInjector implements Injector, BootableInjector
     }
 
     /**
-     * @inheritdoc
-     */
-    public function boot($dependencies):BootableInjector
-    {
-        $this->addToInjectionStrategies(new AdderStrategy());
-        $strategiesToInject = [];
-        foreach ($dependencies as $dependency) {
-            if ( ! $dependency instanceof PropertyDependency) continue;
-            if ( ! $dependency->getValue() instanceof InjectionStrategy) continue;
-            $value = $dependency->getValue();
-            if ($value instanceof InjectionStrategy) {
-                $this->addToInjectionStrategies($value);
-            }
-            else $strategiesToInject[] = $dependency;
-        }
-        $this->inject($this,$strategiesToInject);
-        return $this;
-    }
-
-    /**
      * Insert a new injection strategy service
      * @param InjectionStrategy $injectionStrategy
      * @param int $priority
      * @return Injector
      */
-    public function addToInjectionStrategies(InjectionStrategy &$injectionStrategy):Injector
+    public function addToInjectionStrategies(InjectionStrategy &$injectionStrategy):DefaultInjector
     {
         $this->injectionStrategies[] = $injectionStrategy;
         return $this;

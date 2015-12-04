@@ -5,6 +5,13 @@ namespace Atanor\Di\ObjectBuilding\Construction;
 class ReflectionConstructor implements Constructor
 {
     /**
+     * ReflectionConstructor constructor.
+     */
+    public function __construct()
+    {
+    }
+
+    /**
      * @inheritdoc
      */
     public function canConstruct(string $className, $options = null):bool
@@ -21,5 +28,7 @@ class ReflectionConstructor implements Constructor
         $reflection = new \ReflectionClass($className);
         return $reflection->newInstanceArgs($options);
     }
+
+
 
 }

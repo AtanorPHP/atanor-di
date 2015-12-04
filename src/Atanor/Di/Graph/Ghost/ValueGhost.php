@@ -1,8 +1,8 @@
 <?php
 declare(strict_types = 1);
-namespace Atanor\Di\Graph\Avatar;
+namespace Atanor\Di\Graph\Ghost;
 
-class ValueAvatar implements Avatar
+class ValueGhost implements Ghost
 {
     /**
      * @var mixed
@@ -10,7 +10,7 @@ class ValueAvatar implements Avatar
     protected $value;
 
     /**
-     * ValueAvatar constructor.
+     * ValueGhost constructor.
      * @param mixed $value
      */
     public function __construct($value)
@@ -46,7 +46,7 @@ class ValueAvatar implements Avatar
     /**
      * @inheritDoc
      */
-    public function setObject(&$object):Avatar
+    public function setObject(&$object):Ghost
     {
         return $this;
     }

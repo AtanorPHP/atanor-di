@@ -1,17 +1,17 @@
 <?php
 declare(strict_types = 1);
 
-namespace Atanor\Di\Graph\Avatar;
+namespace Atanor\Di\Graph\Ghost;
 
-use Atanor\Di\Graph\Avatar\Feature\IdentityProvider;
-use Atanor\Di\Graph\Avatar\Feature\IdentityProviderTrait;
+use Atanor\Di\Graph\Ghost\Feature\IdentityProvider;
+use Atanor\Di\Graph\Ghost\Feature\IdentityProviderTrait;
 
-class StubAvatar implements Avatar,IdentityProvider
+class StubGhost implements Ghost,IdentityProvider
 {
     use IdentityProviderTrait;
 
     /**
-     * StubAvatar constructor.
+     * StubGhost constructor.
      * @param string $id
      */
     public function __construct($id)
@@ -46,7 +46,7 @@ class StubAvatar implements Avatar,IdentityProvider
     /**
      * @inheritDoc
      */
-    public function setObject(&$object):Avatar
+    public function setObject(&$object):Ghost
     {
         throw new \Exception('You cannot instantiate a stub instance node');
     }

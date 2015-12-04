@@ -1,15 +1,21 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 namespace Atanor\Di\Container;
 
-use Atanor\Di\Graph\Bond\Bond;
-use Atanor\Di\Graph\Avatar\Avatar;
+use Atanor\Di\Graph\DiGraph;
 
-interface Container
+interface Container extends Materializer
 {
     /**
-     * @param Avatar $node
-     * @return mixed
+     * Set Di graph
+     * @param DiGraph $graph
+     * @return Container
      */
-    public function build(Avatar $node);
+    public function setDiGraph(DiGraph $graph):Container;
+
+    /**
+     * Return di graph
+     * @return DiGraph
+     */
+    public function getDiGraph():DiGraph;
 }

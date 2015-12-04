@@ -19,4 +19,10 @@ interface Constructor
      * @return bool
      */
     public function canConstruct(string $className,$options = null):bool;
+
+    /**
+     * Force empty constructor
+     * Constructor constructor.
+     */
+    public function __construct();
 }

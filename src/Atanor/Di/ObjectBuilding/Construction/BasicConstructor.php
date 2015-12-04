@@ -5,6 +5,13 @@ namespace Atanor\Di\ObjectBuilding\Construction;
 class BasicConstructor implements Constructor
 {
     /**
+     * BasicConstructor constructor.
+     */
+    public function __construct()
+    {
+    }
+
+    /**
      * @inheritDoc
      */
     public function construct(string $className, $options = null)
@@ -20,5 +27,7 @@ class BasicConstructor implements Constructor
         if ($options !== null) return false;
         return true;
     }
+
+
 
 }

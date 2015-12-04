@@ -5,6 +5,13 @@ namespace Atanor\Di\ObjectBuilding\Construction;
 class LittleConstructor implements Constructor
 {
     /**
+     * LittleConstructor constructor.
+     */
+    public function __construct()
+    {
+    }
+
+    /**
      * @inheritDoc
      */
     public function construct(string $className, $options = null)
@@ -29,5 +36,7 @@ class LittleConstructor implements Constructor
         if ($paramCount >= 4) return false;
         return true;
     }
+
+
 
 }

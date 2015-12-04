@@ -10,6 +10,13 @@ class InjectionInterfaceStrategy implements InjectionStrategy
     /**
      * @inheritDoc
      */
+    public function __construct()
+    {
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function canInject(&$instance,Dependency $dependency):bool
     {
         foreach($this->getDependencyInterfaces($dependency->getValue()) as $interface) {

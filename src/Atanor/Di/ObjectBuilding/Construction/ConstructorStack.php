@@ -4,7 +4,7 @@ namespace Atanor\Di\ObjectBuilding\Construction;
 
 use Atanor\Di\ObjectBuilding\Injection\Dependency\PropertyDependency;
 
-class ConstructorStack implements Constructor, BootableConstructor
+class ConstructorStack implements Constructor
 {
     /**
      * Constructors stack
@@ -16,6 +16,14 @@ class ConstructorStack implements Constructor, BootableConstructor
      * @var array|\ArrayAccess
      */
     protected $bestConstructor = [];
+
+    /**
+     * ConstructorStack constructor.
+     */
+    public function __construct()
+    {
+    }
+
 
     /**
      * @inheritdoc

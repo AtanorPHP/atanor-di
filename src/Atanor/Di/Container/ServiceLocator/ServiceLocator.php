@@ -9,38 +9,21 @@ interface ServiceLocator
      * @param string $name
      * @return mixed
      */
-    public function getRegisteredService(string $name);
-
-    /**
-     * Returns service info
-     * @param string $name
-     * @return ServiceInfo
-     */
-    public function getRegisteredServiceInfo(string $name):ServiceInfo;
+    //public function getService(string $name);
 
     /**
      * Returns true if service is registered
      * @param string $name
      * @return bool
      */
-    public function hasRegisteredService(string $name):bool;
+    //public function hasService(string $name):bool;
 
     /**
      * @param string $name
-     * @param string $typeHint
+     * @param string $className
      * @param string|null $serviceNodeClass
      * @return ServiceLocator
      */
-    public function registerService(string $name,string $typeHint,string $serviceNodeClass = null):ServiceLocator;
-
-    /**
-     * Add property dependency edge between two services
-     * @param string $serviceName
-     * @param string $dependencyServiceName
-     * @param string $property
-     * @param string|null $edgeClass
-     * @return ServiceLocator
-     */
-    public function addServicePropertyDependency(string $serviceName,string $dependencyServiceName,string $property,string $edgeClass = null):ServiceLocator;
+    //public function registerService(string $name, string $className):ServiceLocator;
 
 }

@@ -1,9 +1,14 @@
 <?php
 declare(strict_types = 1);
 
-namespace Atanor\Di\Graph\Avatar;
+namespace Atanor\Di\Graph\Ghost;
 
-abstract class AbstractObjectAvatar implements Avatar
+use Atanor\Di\Graph\DiGraph;
+use Atanor\Di\Graph\Link\Link;
+use Atanor\Graph\Graph\Graph;
+use Atanor\Graph\RootedGraph;
+
+abstract class AbstractObjectGhost implements Ghost
 {
     /**
      * Object type hint
@@ -41,7 +46,7 @@ abstract class AbstractObjectAvatar implements Avatar
     public function getObject()
     {
         if ( ! $this->isMaterialized()) {
-            throw new \Exception('Avatar not instantiated');
+            throw new \Exception('Ghost not instantiated');
         }
         return $this->object;
     }
@@ -49,7 +54,7 @@ abstract class AbstractObjectAvatar implements Avatar
     /**
      * @inheritDoc
      */
-    public function setObject(&$object):Avatar
+    public function setObject(&$object):Ghost
     {
         $this->object = $object;
         return $this;
@@ -59,10 +64,12 @@ abstract class AbstractObjectAvatar implements Avatar
      * Set type int
      * @param array|\ArrayAccess $config
      */
-    public function setObjectType($typeHint):Avatar
+    public function setObjectType($typeHint):Ghost
     {
         $this->className = $typeHint;
         return $this;
     }
+
+
 
 }

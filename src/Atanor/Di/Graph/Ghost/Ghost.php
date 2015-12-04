@@ -1,16 +1,16 @@
 <?php
-namespace Atanor\Di\Graph\Avatar;
+namespace Atanor\Di\Graph\Ghost;
 
-interface Avatar
+interface Ghost
 {
     /**
-     * Returns true if avatar has been materialized
+     * Returns true if ghost has been materialized
      * @return bool
      */
     public function isMaterialized():bool;
 
     /**
-     * Returns inner object
+     * Return inner object
      * @return mixed
      */
     public function getObject();
@@ -18,9 +18,9 @@ interface Avatar
     /**
      * Set instance
      * @param $object
-     * @return Avatar
+     * @return Ghost
      */
-    public function setObject(&$object):Avatar;
+    public function setObject(&$object):Ghost;
 
     /**
      * Return object type
