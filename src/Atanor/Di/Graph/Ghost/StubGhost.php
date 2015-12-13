@@ -4,20 +4,37 @@ declare(strict_types = 1);
 namespace Atanor\Di\Graph\Ghost;
 
 use Atanor\Di\Graph\Ghost\Feature\IdentityProvider;
-use Atanor\Di\Graph\Ghost\Feature\IdentityProviderTrait;
+use Atanor\Di\Graph\Ghost\Feature\IdentityProviderFeature;
 
-class StubGhost implements Ghost,IdentityProvider
+class StubGhost extends DefaultGhost implements Ghost,IdentityProvider
 {
-    use IdentityProviderTrait;
-
     /**
      * StubGhost constructor.
      * @param string $id
      */
     public function __construct($id)
     {
-        $this->id = $id;
+        $this->addFeature(new IdentityProviderFeature($this));
+        $this->getFeature(IdentityProviderFeature::class)
+            ->setId($id);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getId():string
+    {
+        return $this->getFeature(IdentityProviderFeature::class)->getId();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getNodeId():string
+    {
+        return $this->getFeature(IdentityProviderFeature::class)->getNodeId();
+    }
+
 
     /**
      * @inheritDoc
@@ -25,29 +42,5 @@ class StubGhost implements Ghost,IdentityProvider
     public function getObjectType():string
     {
         return 'stub';
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function isMaterialized():bool
-    {
-        return false;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getObject()
-    {
-        throw new \Exception('You cannot instantiate a stub instance node');
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setObject(&$object):Ghost
-    {
-        throw new \Exception('You cannot instantiate a stub instance node');
     }
 }

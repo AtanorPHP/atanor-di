@@ -14,7 +14,7 @@ abstract class AbstractObjectGhost implements Ghost
      * Object type hint
      * @var string
      */
-    protected $className;
+    protected $objectType;
 
     /**
      * @var mixed
@@ -29,7 +29,7 @@ abstract class AbstractObjectGhost implements Ghost
         if ($this->isMaterialized()) {
             return get_class($this->object);
         }
-        return $this->className;
+        return $this->objectType;
     }
 
     /**
@@ -66,10 +66,7 @@ abstract class AbstractObjectGhost implements Ghost
      */
     public function setObjectType($typeHint):Ghost
     {
-        $this->className = $typeHint;
+        $this->objectType = $typeHint;
         return $this;
     }
-
-
-
 }

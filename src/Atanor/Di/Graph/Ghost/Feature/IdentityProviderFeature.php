@@ -2,7 +2,9 @@
 declare(strict_types = 1);
 namespace Atanor\Di\Graph\Ghost\Feature;
 
-trait IdentityProviderTrait
+use Atanor\Di\Graph\Ghost\AbstractFeature;
+
+class IdentityProviderFeature extends AbstractFeature implements IdentityProvider
 {
     /**
      * Object ID
@@ -26,5 +28,15 @@ trait IdentityProviderTrait
     public function getNodeId():string
     {
         return $this->getId();
+    }
+
+    /**
+     * @param string $id
+     * @return IdentityProvider
+     */
+    public function setId(string $id):IdentityProvider
+    {
+        $this->id = $id;
+        return $this;
     }
 }

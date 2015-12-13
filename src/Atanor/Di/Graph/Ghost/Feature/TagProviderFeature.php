@@ -2,7 +2,9 @@
 declare(strict_types = 1);
 namespace Atanor\Di\Graph\Ghost\Feature;
 
-trait TagProviderTrait
+use Atanor\Di\Graph\Ghost\AbstractFeature;
+
+class TagProviderFeature extends AbstractFeature implements TagProvider
 {
     /**
      * Tags list

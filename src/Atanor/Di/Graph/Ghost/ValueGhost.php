@@ -2,20 +2,18 @@
 declare(strict_types = 1);
 namespace Atanor\Di\Graph\Ghost;
 
-class ValueGhost implements Ghost
-{
-    /**
-     * @var mixed
-     */
-    protected $value;
+use Atanor\Di\Graph\Ghost\Feature\StorageProviderFeature;
 
+class ValueGhost extends DefaultGhost implements Ghost
+{
     /**
      * ValueGhost constructor.
      * @param mixed $value
      */
     public function __construct($value)
     {
-        $this->value = $value;
+        $this->addFeature(new StorageProviderFeature($this));
+        $this->getFeature(StorageProviderFeature::class)->storeValue($value);
     }
 
     /**
@@ -23,31 +21,18 @@ class ValueGhost implements Ghost
      */
     public function getObjectType():string
     {
-        if (is_object($this->value)) return get_class($this->value);
-        return gettype($this->value);
+        $value = $this->getValue();
+        if (is_object($value)) return get_class($value);
+        return gettype($value);
     }
 
     /**
-     * @inheritDoc
+     * Return value
+     * @return mixed
      */
-    public function isMaterialized():bool
+    public function getValue()
     {
-        return true;
+        return $this->getFeature(StorageProviderFeature::class)->getStoredValue();;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getObject()
-    {
-        return $this->value;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setObject(&$object):Ghost
-    {
-        return $this;
-    }
 }

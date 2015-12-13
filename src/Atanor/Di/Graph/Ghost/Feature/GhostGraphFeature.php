@@ -3,14 +3,13 @@ declare(strict_types = 1);
 namespace Atanor\Di\Graph\Ghost\Feature;
 
 use Atanor\Di\Graph\DiGraph;
+use Atanor\Di\Graph\Ghost\AbstractFeature;
 use Atanor\Graph\Graph\Graph;
 use Atanor\Di\Graph\Ghost\Ghost;
 use Atanor\Di\Graph\Link\Link;
 use Atanor\Graph\RootedGraph;
-use Atanor\Di\Graph\Link\PropertyLink;
-use Atanor\Di\Graph\Link\ConstructorLink;
 
-trait GhostGraphTrait
+class GhostGraphFeature extends AbstractFeature implements GhostGraph
 {
     /**
      * @var DiGraph

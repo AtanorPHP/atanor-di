@@ -3,10 +3,10 @@ declare(strict_types = 1);
 
 namespace Atanor\Di\Container\ServiceLocator;
 
-use Atanor\Di\Graph\Ghost\Feature\GhostGraphTrait;
+use Atanor\Di\Graph\Ghost\Feature\GhostGraphFeature;
 use Atanor\Di\Graph\Ghost\Feature\IdentityProvider;
-use Atanor\Di\Graph\Ghost\Feature\IdentityProviderTrait;
-use Atanor\Di\Graph\Ghost\Feature\TagProviderTrait;
+use Atanor\Di\Graph\Ghost\Feature\IdentityProviderFeature;
+use Atanor\Di\Graph\Ghost\Feature\TagProviderFeature;
 use Atanor\Di\Graph\Ghost\Feature\TagProvider;
 use Atanor\Di\Graph\Ghost\AbstractObjectGhost;
 use Atanor\Di\Graph\Link\ConstructorLink;
@@ -14,9 +14,9 @@ use Atanor\Di\Graph\Link\PropertyLink;
 
 class ServiceGhost extends AbstractObjectGhost implements IdentityProvider,TagProvider
 {
-    use IdentityProviderTrait;
-    use TagProviderTrait;
-    use GhostGraphTrait;
+    use IdentityProviderFeature;
+    use TagProviderFeature;
+    use GhostGraphFeature;
 
     /**
      * @inheritdoc
