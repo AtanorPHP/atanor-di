@@ -2,6 +2,7 @@
 declare(strict_types = 1);
 namespace Atanor\Di\Container;
 
+use Atanor\Di\Graph\Ghost\Feature\UnicityProvider;
 use Atanor\Di\ObjectBuilding\Construction\Constructor;
 use Atanor\Di\ObjectBuilding\Injection\Injector;
 use Atanor\Di\Graph\Ghost\Ghost;
@@ -26,7 +27,9 @@ abstract class AbstractMaterializer implements Materializer
      */
     public function materialize(Ghost $ghost)
     {
-        if ($ghost->isMaterialized()) return $ghost->getObject();
+        if ($ghost instanceof UnicityProvider) {
+            if ($ghost->isMaterialized()) return $ghost->getInstance();
+        }
         if ( ! $ghost instanceof GhostGraph) {
             //@throw execption !!
         }
@@ -35,7 +38,9 @@ abstract class AbstractMaterializer implements Materializer
         $constructorParams = $ghost->getConstructorParams($ghost,[$this,'materialize']);
         $instance = $this->constructor->construct($className,$constructorParams);
         if (count($dependencies) > 0) $this->injector->inject($instance,$dependencies);
-        $ghost->setObject($instance);
+        if ($ghost instanceof UnicityProvider) {
+            if ($ghost->isMaterialized()) return $ghost->setInstance($instance);
+        }
         return $instance;
     }
 

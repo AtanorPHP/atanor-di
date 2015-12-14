@@ -4,6 +4,7 @@ namespace Atanor\Di\Graph\Ghost\Feature;
 
 use Atanor\Di\Graph\DiGraph;
 use Atanor\Di\Graph\Ghost\AbstractFeature;
+use Atanor\Di\Graph\Ghost\Feature;
 use Atanor\Graph\Graph\Graph;
 use Atanor\Di\Graph\Ghost\Ghost;
 use Atanor\Di\Graph\Link\Link;
@@ -109,7 +110,7 @@ class GhostGraphFeature extends AbstractFeature implements GhostGraph
      */
     public function getConstructorParams(Ghost $ghost, $materializationCallback):array
     {
-        return $this->getConstructorParams($ghost,$materializationCallback);
+        return $this->diGraph->getConstructorParams($ghost,$materializationCallback);
     }
 
     /**
@@ -117,7 +118,7 @@ class GhostGraphFeature extends AbstractFeature implements GhostGraph
      */
     public function getRoot()
     {
-        return $this;
+        return $this->ghost;
     }
 
     /**
@@ -146,22 +147,34 @@ class GhostGraphFeature extends AbstractFeature implements GhostGraph
     }
 
     /**
-     * @param GhostGraph $dependency
-     * @param string $linkClass
-     * @param array $params
-     * @return GhostGraph
+     * @inheritdoc
      */
-    public function addDependency(GhostGraph $dependency,string $linkClass, array $params):GhostGraph
+    public function addDependency(GhostGraph $dependency,Link $link):GhostGraph
     {
         if ( ! $this->contains($dependency)) {
-            //@todo throw exception
-        }
-        $link = new $linkClass($this,$dependency);
-        foreach($params as $setterName => $value) {
-            if ( ! method_exists($link,$setterName)) continue;
-            $link->$setterName($value);
+           $this->addNode($dependency);
         }
         $this->addLink($link);
         return $this;
+    }
+    /**
+     * @inheritDoc
+     */
+    public static function build(Ghost $ghost, array $params):Feature
+    {
+        $feature = new self($ghost);
+        if (isset($params['dependencies'])) {
+            foreach($params['dependencies'] as $dependency) {
+                $ghostClass = $dependency['ghostClassName'];
+                $ghostDep = $ghostClass::build($dependency);
+                if ( ! $feature->contains($ghostDep)) {
+                    $feature->addNode($ghostDep);
+                }
+                $linkClass = $dependency['linkClassName'];
+                $link = $linkClass::build($ghost,$ghostDep,$dependency);
+                $feature->addLink($link);
+            }
+        }
+        return $feature;
     }
 }

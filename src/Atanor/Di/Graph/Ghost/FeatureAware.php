@@ -8,7 +8,7 @@ interface FeatureAware
      * @param Feature $feature
      * @return Ghost
      */
-    public function addFeature(Feature $feature) : Ghost;
+    public function addFeature(Feature $feature) : FeatureAware;
 
     /**
      * @param string $featureClassName

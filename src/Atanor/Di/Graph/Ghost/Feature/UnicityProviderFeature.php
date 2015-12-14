@@ -3,29 +3,16 @@ declare(strict_types = 1);
 namespace Atanor\Di\Graph\Ghost\Feature;
 
 use Atanor\Di\Graph\Ghost\AbstractFeature;
+use Atanor\Di\Graph\Ghost\Feature;
 use Atanor\Di\Graph\Ghost\FeatureAware;
 use Atanor\Di\Graph\Ghost\Ghost;
 
 class UnicityProviderFeature extends AbstractFeature implements UnicityProvider
 {
     /**
-     * UnicityProviderFeature constructor.
-     */
-    public function __construct(Ghost $ghost)
-    {
-        if ( ! $ghost instanceof FeatureAware) {
-            //@todo throw exception
-        }
-        $this->ghost = $ghost;
-        if ( ! $ghost->hasFeature(StorageProviderFeature::class)) {
-            $this->ghost->addFeature(new StorageProviderFeature($ghost));
-        }
-    }
-
-    /**
      * @inheritDoc
      */
-    public function hasStoredValue():bool
+    public function isMaterialized():bool
     {
         return $this->ghost->getFeature(StorageProviderFeature::class)->hasStoredValue();
     }
@@ -33,7 +20,7 @@ class UnicityProviderFeature extends AbstractFeature implements UnicityProvider
     /**
      * @inheritDoc
      */
-    public function getStoredValue()
+    public function getInstance()
     {
         return $this->ghost->getFeature(StorageProviderFeature::class)->getStoredValue();
     }
@@ -41,24 +28,23 @@ class UnicityProviderFeature extends AbstractFeature implements UnicityProvider
     /**
      * @inheritDoc
      */
-    public function storeValue(&$value):Ghost
+    public function setInstance($instance):UnicityProvider
     {
-        return $this->ghost->getFeature(StorageProviderFeature::class)->storeValue($value);
+        return $this->ghost->getFeature(StorageProviderFeature::class)->storeValue($instance);
     }
 
     /**
      * @inheritDoc
      */
-    public function isMaterialized():bool
+    public static function build(Ghost $ghost, array $params):Feature
     {
-        return $this->hasStoredValue();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getInsatnce()
-    {
-        return $this->getStoredValue();
+        if ( ! $ghost instanceof FeatureAware) {
+            //@todo throw exception
+        }
+        $feature = new self($ghost);
+        if ( ! $ghost->hasFeature(StorageProviderFeature::class)) {
+            $ghost->addFeature(StorageProviderFeature::build($ghost,$params));
+        }
+        return $feature;
     }
 }

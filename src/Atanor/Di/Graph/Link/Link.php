@@ -9,8 +9,10 @@ use Atanor\Graph\Edge\Arrow;
 interface Link extends Arrow
 {
     /**
-     * Empty constructor
-     * Link constructor.
+     * @param Ghost $tail
+     * @param Ghost $head
+     * @param array $params
+     * @return Link
      */
-    public function __construct(Ghost $tail,Ghost $head);
+    public function build(Ghost $tail,Ghost $head,array $params = array()):Link;
 }

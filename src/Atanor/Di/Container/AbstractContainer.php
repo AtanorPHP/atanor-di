@@ -44,6 +44,4 @@ abstract class AbstractContainer extends AbstractMaterializer implements Contain
     {
         return $this->diGraph;
     }
-
-
 }

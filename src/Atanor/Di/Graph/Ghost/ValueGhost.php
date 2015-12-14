@@ -4,18 +4,8 @@ namespace Atanor\Di\Graph\Ghost;
 
 use Atanor\Di\Graph\Ghost\Feature\StorageProviderFeature;
 
-class ValueGhost extends DefaultGhost implements Ghost
+class ValueGhost extends AbstractFeaturedGhost implements Ghost
 {
-    /**
-     * ValueGhost constructor.
-     * @param mixed $value
-     */
-    public function __construct($value)
-    {
-        $this->addFeature(new StorageProviderFeature($this));
-        $this->getFeature(StorageProviderFeature::class)->storeValue($value);
-    }
-
     /**
      * @inheritDoc
      */
@@ -32,7 +22,20 @@ class ValueGhost extends DefaultGhost implements Ghost
      */
     public function getValue()
     {
-        return $this->getFeature(StorageProviderFeature::class)->getStoredValue();;
+        return $this->getFeature(StorageProviderFeature::class)->getStoredValue();
     }
 
+    /**
+     * @inheritDoc
+     * @return ValueGhost
+     */
+    public static function build(array $params):Ghost
+    {
+        $ghost = new self();
+        $ghost->addFeature(new StorageProviderFeature($ghost));
+        if (isset($params['value'])) {
+            $ghost->getFeature(StorageProviderFeature::class)->storeValue($params['value']);
+        }
+        return $ghost;
+    }
 }

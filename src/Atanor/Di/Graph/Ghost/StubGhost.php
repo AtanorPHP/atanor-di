@@ -6,7 +6,7 @@ namespace Atanor\Di\Graph\Ghost;
 use Atanor\Di\Graph\Ghost\Feature\IdentityProvider;
 use Atanor\Di\Graph\Ghost\Feature\IdentityProviderFeature;
 
-class StubGhost extends DefaultGhost implements Ghost,IdentityProvider
+class StubGhost extends AbstractFeaturedGhost implements Ghost,IdentityProvider
 {
     /**
      * StubGhost constructor.

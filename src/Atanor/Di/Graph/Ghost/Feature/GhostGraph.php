@@ -4,6 +4,7 @@ namespace Atanor\Di\Graph\Ghost\Feature;
 
 use Atanor\Di\Graph\DiGraph;
 use Atanor\Di\Graph\Link\ConstructorLink;
+use Atanor\Di\Graph\Link\Link;
 use Atanor\Graph\RootedGraph;
 use Atanor\Di\Graph\Link\PropertyLink;
 
@@ -24,9 +25,8 @@ interface GhostGraph extends DiGraph,RootedGraph
 
     /**
      * @param GhostGraph $dependency
-     * @param string $linkClass
-     * @param array $params
+     * @param Link $link
      * @return GhostGraph
      */
-    public function addDependency(GhostGraph $dependency,string $linkClass, array $params):GhostGraph;
+    public function addDependency(GhostGraph $dependency,Link $link):GhostGraph;
 }

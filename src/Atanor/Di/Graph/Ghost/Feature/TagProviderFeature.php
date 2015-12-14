@@ -3,6 +3,8 @@ declare(strict_types = 1);
 namespace Atanor\Di\Graph\Ghost\Feature;
 
 use Atanor\Di\Graph\Ghost\AbstractFeature;
+use Atanor\Di\Graph\Ghost\Feature;
+use Atanor\Di\Graph\Ghost\Ghost;
 
 class TagProviderFeature extends AbstractFeature implements TagProvider
 {
@@ -44,4 +46,18 @@ class TagProviderFeature extends AbstractFeature implements TagProvider
         }
         return $this;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function build(Ghost $ghost, array $params):Feature
+    {
+        $feature = new self($ghost);
+        if (isset($params['tags'])) {
+            $feature->addTags($params['tags']);
+        }
+        return $feature;
+    }
+
+
 }

@@ -9,10 +9,13 @@ use Atanor\Di\Graph\Ghost\Ghost;
 class DefaultLink extends DefaultArrow implements  Link
 {
     /**
-     * DefaultLink constructor.
+     * @inheritDoc
      */
-    public function __construct(Ghost $tail,Ghost $head)
+    public function build(Ghost $tail, Ghost $head, array $params = array()):Link
     {
-        $this->setEnds($tail,$head);
+        $link = new self($tail,$head);
+        return $link;
     }
+
+
 }

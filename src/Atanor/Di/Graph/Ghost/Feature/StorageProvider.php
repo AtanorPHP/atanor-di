@@ -6,6 +6,8 @@ use Atanor\Di\Graph\Ghost\Ghost;
 
 interface StorageProvider
 {
+    const PARAM_VALUE = 'value';
+
     /**
      * Returns true if ghost has been materialized
      * @return bool

@@ -3,30 +3,25 @@ declare(strict_types = 1);
 
 namespace Atanor\Di\Container\ServiceLocator;
 
+use Atanor\Di\Graph\Ghost\AbstractFeaturedGhost;
 use Atanor\Di\Graph\Ghost\Feature\GhostGraphFeature;
 use Atanor\Di\Graph\Ghost\Feature\IdentityProvider;
 use Atanor\Di\Graph\Ghost\Feature\IdentityProviderFeature;
-use Atanor\Di\Graph\Ghost\Feature\TagProviderFeature;
-use Atanor\Di\Graph\Ghost\Feature\TagProvider;
-use Atanor\Di\Graph\Ghost\AbstractObjectGhost;
+use Atanor\Di\Graph\Ghost\Feature\UnicityProvider;
+use Atanor\Di\Graph\Ghost\Feature\UnicityProviderFeature;
 use Atanor\Di\Graph\Link\ConstructorLink;
 use Atanor\Di\Graph\Link\PropertyLink;
+use Atanor\Di\Graph\Ghost\Ghost;
+use Atanor\Graph\Node\NodeIdProvider;
 
-class ServiceGhost extends AbstractObjectGhost implements IdentityProvider,TagProvider
+class ServiceGhost extends AbstractFeaturedGhost implements Ghost,NodeIdProvider,IdentityProvider,UnicityProvider
 {
-    use IdentityProviderFeature;
-    use TagProviderFeature;
-    use GhostGraphFeature;
+    const PARAM_OBJECT_TYPE_NAME = 'objectType';
 
     /**
-     * @inheritdoc
+     * @var string
      */
-    public function __construct(string $id,string $className,array $tags = [])
-    {
-        $this->id = $id;
-        $this->setObjectType($className);
-        if (count($tags)>0) $this->addTags($tags);
-    }
+    protected $objectType;
 
     /**
      * Add property dependnecy
@@ -58,5 +53,85 @@ class ServiceGhost extends AbstractObjectGhost implements IdentityProvider,TagPr
         $link = new ConstructorLink($this,$this->getNode($dependencyId));
         $link->setPosition($position);
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getObjectType():string
+    {
+        return $this->objectType;
+    }
+
+    /**
+     * @param string $objectType
+     */
+    public function setObjectType(string $objectType):ServiceGhost
+    {
+        $this->objectType = $objectType;
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getNodeId():string
+    {
+        return $this->getFeature(IdentityProviderFeature::class)->getNodeId();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getId():string
+    {
+        return $this->getFeature(IdentityProviderFeature::class)->getId();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setId(string $id):IdentityProvider
+    {
+        return $this->getFeature(IdentityProviderFeature::class)->setId();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isMaterialized():bool
+    {
+        return $this->getFeature(UnicityProviderFeature::class)->isMaterialized();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getInstance()
+    {
+        return $this->getFeature(UnicityProviderFeature::class)->getInstance();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setInstance($instance):UnicityProvider
+    {
+        return $this->getFeature(UnicityProviderFeature::class)->setInstance($instance);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function build(array $params):Ghost
+    {
+        $ghost = new self();
+        $ghost->addFeature(IdentityProviderFeature::build($ghost,$params))
+            ->addFeature(GhostGraphFeature::build($ghost,$params))
+            ->addFeature(UnicityProviderFeature::build($ghost,$params));
+        if (isset($params[self::PARAM_OBJECT_TYPE_NAME])) {
+            $ghost->setObjectType($params[self::PARAM_OBJECT_TYPE_NAME]);
+        }
+        return $ghost;
     }
 }

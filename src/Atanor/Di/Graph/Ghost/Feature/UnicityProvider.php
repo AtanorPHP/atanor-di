@@ -2,7 +2,7 @@
 declare(strict_types = 1);
 namespace Atanor\Di\Graph\Ghost\Feature;
 
-interface UnicityProvider extends StorageProvider
+interface UnicityProvider
 {
     /**
      * @return bool
@@ -12,5 +12,11 @@ interface UnicityProvider extends StorageProvider
     /**
      * @return mixed
      */
-    public function getInsatnce();
+    public function getInstance();
+
+    /**
+     * @param $instance
+     * @return UnicityProvider
+     */
+    public function setInstance($instance):UnicityProvider;
 }

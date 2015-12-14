@@ -19,7 +19,7 @@ class DefaultRegistry extends AbstractContainer implements Registry
      */
     public function set(string $id, $value):Registry
     {
-        $ghost = new RegistryEntryGhost($id,$value);
+        $ghost = RegistryEntryGhost::build(['key'=>$id,'value' => $value]);
         $this->diGraph->addGhost($ghost);
         return $this;
     }

@@ -11,6 +11,8 @@ use Atanor\Graph\Edge\MutableEdge;
 
 class PropertyLink extends DefaultLink implements Link,MutableEdge
 {
+    const PARAM_PROPERTY_NAME = 'property';
+
     /**
      * @var string
      */
@@ -35,5 +37,17 @@ class PropertyLink extends DefaultLink implements Link,MutableEdge
         if ( ! empty($this->property)) return $this;
         $this->property = $property;
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function build(Ghost $tail, Ghost $head, array $params = array()):Link
+    {
+        $link = new self($tail,$head);
+        if (isset($params[self::PARAM_PROPERTY_NAME])) {
+            $link->setProperty($params[self::PARAM_PROPERTY_NAME]);
+        }
+        return $link;
     }
 }

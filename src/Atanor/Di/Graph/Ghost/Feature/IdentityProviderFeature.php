@@ -3,6 +3,8 @@ declare(strict_types = 1);
 namespace Atanor\Di\Graph\Ghost\Feature;
 
 use Atanor\Di\Graph\Ghost\AbstractFeature;
+use Atanor\Di\Graph\Ghost\Feature;
+use Atanor\Di\Graph\Ghost\Ghost;
 
 class IdentityProviderFeature extends AbstractFeature implements IdentityProvider
 {
@@ -39,4 +41,18 @@ class IdentityProviderFeature extends AbstractFeature implements IdentityProvide
         $this->id = $id;
         return $this;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function build(Ghost $ghost, array $params):Feature
+    {
+        $feature = new self($ghost);
+        if (isset($params[self::PARAM_ID_NAME])) {
+            $feature->setId($params[self::PARAM_ID_NAME]);
+        }
+        return $feature;
+    }
+
+
 }
