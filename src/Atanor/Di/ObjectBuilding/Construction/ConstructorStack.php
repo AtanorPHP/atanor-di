@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace Atanor\Di\ObjectBuilding\Construction;
 
-use Atanor\Di\ObjectBuilding\Injection\Dependency\PropertyDependency;
+use Atanor\Di\ObjectBuilding\Injection\Dependency\PropertyDefaultDependency;
 
 class ConstructorStack implements Constructor
 {
@@ -101,7 +101,7 @@ class ConstructorStack implements Constructor
     public function boot($dependencies):BootableConstructor
     {
         foreach ($dependencies as $dependency) {
-            if ( ! $dependency instanceof PropertyDependency) continue;
+            if ( ! $dependency instanceof PropertyDefaultDependency) continue;
             if ( ! $dependency->getValue() instanceof Constructor) continue;
             $this->addToConstructorStack($dependency->getValue());
         }

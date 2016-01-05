@@ -4,18 +4,17 @@ namespace Atanor\Di\Graph\Ghost\Feature;
 
 use Atanor\Graph\Node\NodeIdProvider;
 
-interface IdentityProvider extends NodeIdProvider
+interface NamedGhost extends NodeIdProvider
 {
-    const PARAM_ID_NAME = 'id';
     /**
-     * IdentityProvider name
+     * NamedGhost name
      * @return string
      */
     public function getId():string;
 
     /**
      * @param string $id
-     * @return IdentityProvider
+     * @return NamedGhost
      */
-    public function setId(string $id):IdentityProvider;
+    public function setId(string $id):NamedGhost;
 }

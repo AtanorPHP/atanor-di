@@ -1,0 +1,21 @@
+{
+    "name": "atanor/di",
+    "description": "Graph based dependency injection component",
+    "authors": [
+        {
+            "name": "sophpie",
+            "email": "sop.beaupuis@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "atanor/graph" : "*",
+        "container-interop/container-interop":"*",
+        "atanor/core" : "*"
+    },
+    "autoload" : {
+        "psr-4" : {
+            "Atanor\\Di\\" : "src/Atanor/Di"
+        }
+    }
+}

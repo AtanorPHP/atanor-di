@@ -7,25 +7,35 @@ use Atanor\Di\Graph\Ghost\Ghost;
 use Atanor\Di\ObjectBuilding\Construction\Constructor;
 use Atanor\Di\ObjectBuilding\Injection\Injector;
 
-interface Materializer
+interface Wizard
 {
     /**
      * @param Ghost $ghost
      * @return mixed
      */
-    public function materialize(Ghost $ghost);
+    public function invoke(Ghost $ghost);
 
     /**
      * Set constructor
      * @param Constructor $constructor
-     * @return Materializer
+     * @return Wizard
      */
-    public function setConstructor(Constructor $constructor):Materializer;
+    public function setConstructor(Constructor $constructor):Wizard;
 
     /**
      * Set injector
      * @param Injector $injector
-     * @return Materializer
+     * @return Wizard
      */
-    public function setInjector(Injector $injector):Materializer;
+    public function setInjector(Injector $injector):Wizard;
+
+    /**
+     * @return Injector
+     */
+    public function getInjector():Injector;
+
+    /**
+     * @return Constructor
+     */
+    public function getConstructor():Constructor;
 }

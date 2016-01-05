@@ -2,11 +2,11 @@
 declare(strict_types=1);
 namespace Atanor\Di\ObjectBuilding\Injection;
 
+use Atanor\Core\Exception\SystemException;
 use Atanor\Di\Exception\BestInjectionStrategyNotFound;
 use Atanor\Di\Exception\NoSuitableInjectionStrategyFoundException;
 use Atanor\Di\ObjectBuilding\Injection\Dependency\Dependency;
 use Atanor\Di\ObjectBuilding\Injection\Dependency\PropertyDependency;
-use Atanor\Di\ObjectBuilding\Injection\Strategy\AdderStrategy;
 use Atanor\Di\ObjectBuilding\Injection\Strategy\InjectionStrategy;
 
 /**
@@ -78,7 +78,7 @@ class DefaultInjector implements Injector
      * @param Dependency $dependency
      * @return Injector
      */
-    public function addToFavoriteInjectionStrategies(string $className,InjectionStrategy &$strategy,Dependency $dependency):Injector
+    public function addToFavoriteInjectionStrategies(string $className, InjectionStrategy &$strategy, Dependency $dependency):Injector
     {
         if ( ! isset($this->favoriteInjectionStrategies[$className])) $this->favoriteInjectionStrategies[$className] = [];
         $tag = $this->getFavoriteStrategyDependencyTag($dependency);
@@ -92,11 +92,12 @@ class DefaultInjector implements Injector
      * @param Dependency $dependency
      * @return bool
      */
-    public function hasFavoriteInjectionStrategy(string $className,Dependency $dependency):bool
+    public function hasFavoriteInjectionStrategy(string $className, Dependency $dependency):bool
     {
         if ( ! isset($this->favoriteInjectionStrategies[$className])) return false;
+
         $tag = $this->getFavoriteStrategyDependencyTag($dependency);
-        return isset($this->favoriteInjectionStrategies[$className[$tag]]);
+        return isset($this->favoriteInjectionStrategies[$className][$tag]);
     }
 
     /**
@@ -106,13 +107,13 @@ class DefaultInjector implements Injector
      * @return InjectionStrategy
      * @throws BestInjectionStrategyNotFound
      */
-    public function getFavoriteInjectionStrategy(string $className,Dependency $dependency):InjectionStrategy
+    public function getFavoriteInjectionStrategy(string $className, Dependency $dependency):InjectionStrategy
     {
         if ( ! $this->hasFavoriteInjectionStrategy($className,$dependency)) {
             throw new BestInjectionStrategyNotFound();
         }
         $tag = $this->getFavoriteStrategyDependencyTag($dependency);
-        return $this->favoriteInjectionStrategies[$className[$tag]];
+        return $this->favoriteInjectionStrategies[$className][$tag];
     }
 
     /**
@@ -138,13 +139,15 @@ class DefaultInjector implements Injector
      * @return InjectionStrategy
      * @throws \Exception
      */
-    protected function selectInjectionStrategy(&$instance,Dependency $dependency):InjectionStrategy
+    protected function selectInjectionStrategy(&$instance, Dependency $dependency):InjectionStrategy
     {
         foreach($this->injectionStrategies as $injectionStrategy) {
             /** @var InjectionStrategy $injectionStrategy */
             if ( ! $injectionStrategy->canInject($instance,$dependency)) continue;
             return $injectionStrategy;
         }
-        throw new NoSuitableInjectionStrategyFoundException();
+        $exceptionMessage = "Cannot find suitable injection strategy for" . get_class($dependency->getValue());
+        $exceptionMessage .= " into ".get_class($instance);
+        throw new SystemException($exceptionMessage);
     }
 }

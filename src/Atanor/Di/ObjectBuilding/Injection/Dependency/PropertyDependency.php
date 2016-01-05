@@ -2,31 +2,15 @@
 declare(strict_types = 1);
 namespace Atanor\Di\ObjectBuilding\Injection\Dependency;
 
-class PropertyDependency extends  Dependency
+interface PropertyDependency extends Dependency
 {
-
     /**
-     * Property name
-     * @var string
+     * @return string
      */
-    protected $propertyName;
-
-    /**
-     * PropertyDependency constructor.
-     * @param string $propertyName
-     * @param mixed $value
-     */
-    public function __construct(string $propertyName, $value)
-    {
-        $this->propertyName = $propertyName;
-        $this->value = $value;
-    }
+    public function getPropertyName():string;
 
     /**
      * @return string
      */
-    public function getPropertyName():string
-    {
-        return $this->propertyName;
-    }
+    public function setPropertyName(string $name):PropertyDependency;
 }

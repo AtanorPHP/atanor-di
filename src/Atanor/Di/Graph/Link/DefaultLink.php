@@ -3,18 +3,39 @@ declare(strict_types = 1);
 
 namespace Atanor\Di\Graph\Link;
 
+use Atanor\Di\ObjectBuilding\Injection\Dependency\Dependency;
 use Atanor\Graph\Edge\DefaultArrow;
-use Atanor\Di\Graph\Ghost\Ghost;
 
-class DefaultLink extends DefaultArrow implements  Link
+class DefaultLink extends DefaultArrow implements Link
 {
+    /**
+     * @var mixed
+     */
+    protected $value;
+
     /**
      * @inheritDoc
      */
-    public function build(Ghost $tail, Ghost $head, array $params = array()):Link
+    public function getValue()
     {
-        $link = new self($tail,$head);
-        return $link;
+        return $this->value;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setValue($value):Dependency
+    {
+        $this->value = $value;
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function build(array $params):Link
+    {
+        return new static();
     }
 
 

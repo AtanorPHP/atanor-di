@@ -39,14 +39,14 @@ class ConstructorLink extends DefaultLink implements Link
     /**
      * @inheritDoc
      */
-    public function build(Ghost $tail, Ghost $head, array $params = array()):Link
+    public static function build(array $params):Link
     {
-        $link = new self($tail,$head);
-        if (isset($params[self::PARAM_POSITION_NAME])) {
-            $link->setPosition($params[self::PARAM_POSITION_NAME]);
-        }
+        $link = parent::build($params);
+        $link->setPosition($params['position']);
         return $link;
     }
+
+
 
 
 }

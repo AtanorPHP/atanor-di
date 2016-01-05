@@ -3,16 +3,14 @@ declare(strict_types = 1);
 
 namespace Atanor\Di\Graph\Link;
 
-use Atanor\Di\Graph\Ghost\Ghost;
+use Atanor\Di\ObjectBuilding\Injection\Dependency\Dependency;
 use Atanor\Graph\Edge\Arrow;
 
-interface Link extends Arrow
+interface Link extends Arrow,Dependency
 {
     /**
-     * @param Ghost $tail
-     * @param Ghost $head
      * @param array $params
      * @return Link
      */
-    public function build(Ghost $tail,Ghost $head,array $params = array()):Link;
+    public static function build(array $params):Link;
 }

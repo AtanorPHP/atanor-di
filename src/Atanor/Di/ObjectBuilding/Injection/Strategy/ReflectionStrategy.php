@@ -18,7 +18,7 @@ class ReflectionStrategy implements InjectionStrategy
     /**
      * @inheritDoc
      */
-    public function canInject(&$instance,Dependency $dependency):bool
+    public function canInject(&$instance, Dependency $dependency):bool
     {
         if ( ! $dependency instanceof PropertyDependency) return false;
         $reflectionClass = new \ReflectionClass($instance);
@@ -34,11 +34,12 @@ class ReflectionStrategy implements InjectionStrategy
     /**
      * @inheritDoc
      */
-    public function inject(&$instance,Dependency $dependency)
+    public function inject(&$instance, Dependency $dependency)
     {
         if ( ! $this->canInject($instance,$dependency)) {
             throw new DependencyNotInjectable();
         }
+        /** @var PropertyDependency $dependency */
         $propertyName = $dependency->getPropertyName();
         $reflectionClass = new \ReflectionClass($instance);
         $property = $reflectionClass->getProperty($propertyName);

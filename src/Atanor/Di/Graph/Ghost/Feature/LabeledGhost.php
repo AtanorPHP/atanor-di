@@ -2,7 +2,7 @@
 declare(strict_types = 1);
 namespace Atanor\Di\Graph\Ghost\Feature;
 
-interface TagProvider
+interface LabeledGhost
 {
     /**
      * Return array of tags
@@ -13,7 +13,7 @@ interface TagProvider
     /**
      * Add a tag
      * @param string $tag
-     * @return TagProvider
+     * @return LabeledGhost
      */
-    public function addTag(string $tag):TagProvider;
+    public function addTag(string $tag):LabeledGhost;
 }

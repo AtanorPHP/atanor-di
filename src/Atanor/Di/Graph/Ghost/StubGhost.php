@@ -3,13 +3,13 @@ declare(strict_types = 1);
 
 namespace Atanor\Di\Graph\Ghost;
 
-use Atanor\Di\Graph\Ghost\Feature\IdentityProvider;
+use Atanor\Di\Graph\Ghost\Feature\NamedGhost;
 use Atanor\Di\Graph\Ghost\Feature\IdentityProviderFeature;
 
-class StubGhost extends AbstractFeaturedGhost implements Ghost,IdentityProvider
+class StubGhostPrototype extends GhostPrototype implements Ghost,NamedGhost
 {
     /**
-     * StubGhost constructor.
+     * StubGhostPrototype constructor.
      * @param string $id
      */
     public function __construct($id)

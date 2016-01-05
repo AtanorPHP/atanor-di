@@ -3,40 +3,11 @@ declare(strict_types = 1);
 
 namespace Atanor\Di\Graph;
 
-use Atanor\Di\Graph\Link\Link;
 use Atanor\Di\Graph\Ghost\Ghost;
-use Atanor\Graph\Graph\Graph;
+use Atanor\Graph\Graph\DirectedGraph;
 
-interface DiGraph extends Graph
+interface DiGraph extends DirectedGraph
 {
-    /**
-     * Add avatar
-     * @param Ghost $ghost
-     * @return DiGraph
-     */
-    public function addGhost(Ghost $ghost):DiGraph;
-
-    /**
-     * Add bond
-     * @param Link $link
-     * @return DiGraph
-     */
-    public function addLink(Link $link):DiGraph;
-
-    /**
-     * Get all dependencies
-     * @param Ghost $ghost
-     * @return mixed
-     */
-    public function getDependencyLinks(Ghost $ghost):array;
-
-    /**
-     * Returns true if node as dependencies
-     * @param Ghost $ghost
-     * @return bool
-     */
-    public function hasDependencyLinks(Ghost $ghost):bool;
-
     /**
      * Return dependencies of a node as dependency objects
      * Callback callable is used to generate the dependency value from dependency nodes.
@@ -44,13 +15,48 @@ interface DiGraph extends Graph
      * @param callable $materializationCallback
      * @return mixed
      */
-    public function getDependencyObjects(Ghost $ghost, $materializationCallback):array;
+    public function getDependencies(Ghost $ghost, $materializationCallback):array;
 
     /**
      * Return contructor parameter as key value pair
      * @param Ghost $ghost
-     * @param $materializationCallback
+     * @param $invocationCallback
      * @return mixed
      */
-    public function getConstructorParams(Ghost $ghost, $materializationCallback):array;
+    public function getConstructorDependencies(Ghost $ghost, $invocationCallback):array;
+
+    /**
+     * @param Ghost $ghost
+     * @return bool
+     */
+    public function hasConstructorDependencies(Ghost $ghost):bool;
+
+    /**
+     * @param Ghost $ghost
+     * @param $invocationCallback
+     * @return mixed
+     */
+    public function getInjectableDependencies(Ghost $ghost, $invocationCallback):array;
+
+    /**
+     * @param Ghost $ghost
+     * @return bool
+     */
+    public function hasInjectableDependencies(Ghost $ghost):bool;
+
+    /**
+     * @param Ghost $ghost
+     * @param $value
+     * @param string $property
+     * @return DiGraph
+     */
+    public function addPropertyDependency(Ghost $ghost,$value,string $property):DiGraph;
+
+    /**
+     * @param Ghost $ghost
+     * @param $value
+     * @param int $position
+     * @return DiGraph
+     */
+    public function addConstructorDependency(Ghost $ghost,$value,int $position):DiGraph;
 }

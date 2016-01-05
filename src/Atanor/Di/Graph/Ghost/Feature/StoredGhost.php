@@ -4,10 +4,8 @@ namespace Atanor\Di\Graph\Ghost\Feature;
 
 use Atanor\Di\Graph\Ghost\Ghost;
 
-interface StorageProvider
+interface StoredGhost
 {
-    const PARAM_VALUE = 'value';
-
     /**
      * Returns true if ghost has been materialized
      * @return bool

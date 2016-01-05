@@ -3,51 +3,41 @@ declare(strict_types = 1);
 
 namespace Atanor\Di\Graph\Link;
 
-use Atanor\Di\Graph\Ghost\Ghost;
-use Atanor\Di\ObjectBuilding\Injection\Dependency\Dependency;
 use Atanor\Di\ObjectBuilding\Injection\Dependency\PropertyDependency;
-use Atanor\Graph\Edge\DefaultArrow;
-use Atanor\Graph\Edge\MutableEdge;
 
-class PropertyLink extends DefaultLink implements Link,MutableEdge
+class PropertyLink extends DefaultLink implements Link,PropertyDependency
 {
-    const PARAM_PROPERTY_NAME = 'property';
-
     /**
      * @var string
      */
     protected $property;
 
     /**
-     * Retunrs propertyName
-     * @return string
+     * @inheritDoc
      */
-    public function getProperty():string
+    public function getPropertyName():string
     {
         return $this->property;
     }
 
     /**
-     * Set property name
-     * @param string $property
-     * @return PropertyLink
+     * @inheritDoc
      */
-    public function setProperty(string $property):PropertyLink
+    public function setPropertyName(string $name):PropertyDependency
     {
-        if ( ! empty($this->property)) return $this;
-        $this->property = $property;
+        $this->property = $name;
         return $this;
     }
 
     /**
      * @inheritDoc
      */
-    public function build(Ghost $tail, Ghost $head, array $params = array()):Link
+    public static function build(array $params):Link
     {
-        $link = new self($tail,$head);
-        if (isset($params[self::PARAM_PROPERTY_NAME])) {
-            $link->setProperty($params[self::PARAM_PROPERTY_NAME]);
-        }
+        $link = parent::build($params);
+        $link->setPropertyName($params['property']);
         return $link;
     }
+
+
 }

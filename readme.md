@@ -1,30 +1,42 @@
-Atanor Di - Graph based dependency injector
+Dependency Injection graph (DiGraph)
+-----
+A DiGraph is a representation of the link that exists between some instances.Relationship between all services 
+of an application can be describe as DiGraph.
+DiGraph purpose is not to hold instances but registering data needed to build any instance.
 
-About dependency in OOP
-Any object in OOP may  use another one for any task. Having perfectly decoupled object is impossible and you have to deal
-with it in your applications every day. The main issue with dependency is to manage the risk of seeing an object stopping 
-running as expected when one of its dependency class has been changed.
-There is a rule that prevent dependency management to become a nightmare called Dependency Inversion.
-Abstraction like interfaces and abstract class are more stable than concrete classes. For this reason it is always
-best to create dependency to abstraction instead of concrete class.
-That lead us to another problem, if a class has a dependency to abstraction, it becomes enable to build its own dependencies.
-To deal with this, we have to use Dependency Injection which is a process that inject expected concrete dependency into an object.
-Dependency injection is managed mostly by constructor or "setters" :
+Ghosts
+------
+A ghost is a virtual representation of an object instance within a Dependency Injection Graph (DiGraph).
 
-Dependency Graph
-Many objects of your application may have several dependencies to objects an those objects also have dependencies. 
-Most objects of your application, mainly "services" are shared between a lot of other instances through dependency.
-At the end it create a dependency graph in which every instance is a node that is linked to others nodes.
-It means that building a giving object of this graph imply starting by building its dependent objects, and then inject 
-them into the first object. Obviously those dependency may need some other object to be instantiated first. You see the problem.
-To deal with that sort of complexity, we make use of Injection container that are able to ease the process for you.
+Wizard
+------
+Wizard is an object able to build an instance from its ghost (invocation). To do that a Wizard will make use of a Constructor 
+and an injector.
 
-Injection containers
-Injection containers mainly use 
+Dependency Injection containers
+------
+A container is a mix of a Wizard and a DiGraph. It can invoke (build) any instance Ghost contained into the DiGraph.
 
-The Atanor point of view.
-Atanor\Di is a dependency injection componenet base on Dependency graphs.
-Be cause at the end of the day, object will creat a graph, we decide to strat from this graph to describe how object will be
-connected to each other when instantiated.
+Injectors
+------
+It is an object responsible of injection of already instantiated objects into a target object.
+It use Injection Strategies to do that.
+Each InjectionStrategy is a way to inject dependency into an object:
 
-The Ghos
+- Setter injection using setters
+- Reflection injection using reflection
+- Injection interface injection
+etc.
+Injected dependnecy are represneted has "Dependency" objet which is an object containing data to inject and data 
+used to manage injection : property name by example.
+
+Constructors
+------
+Constructor is an object made to build an object of a given class using its constructor. Constructors will be feed
+with class name and constructor parameters.
+There is many type of constructor dependnding on the algorithm they use to deal with instance building:
+"new" statement
+Reflection
+a stack of other constructor.
+
+

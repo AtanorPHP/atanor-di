@@ -3,88 +3,28 @@ declare(strict_types = 1);
 
 namespace Atanor\Di\Graph;
 
-use Atanor\Di\Graph\Ghost\Feature\GhostGraph;
+use Atanor\Di\Graph\Ghost\Feature\DiGraphAware;
 use Atanor\Di\Graph\Link\ConstructorLink;
-use Atanor\Di\Graph\Link\Link;
 use Atanor\Di\Graph\Ghost\Ghost;
-use Atanor\Graph\Graph\AbstractGraph;
 use Atanor\Di\Graph\Link\PropertyLink;
-use Atanor\Di\Graph\Ghost\ValueGhost;
-use Atanor\Di\ObjectBuilding\Injection\Dependency;
-use Atanor\Di\ObjectBuilding\Injection\Dependency\PropertyDependency;
+use Atanor\Graph\Graph\AbstractDirectedGraph;
+use Atanor\Graph\Graph\Graph;
 
-class DefaultDiGraph extends AbstractGraph implements DiGraph
+class DefaultDiGraph extends AbstractDirectedGraph implements DiGraph
 {
-    /**
-     * @var Ghost
-     */
-    protected $rootGhost;
-
-    /**
-     * @inheritDoc
-     */
-    public function addGhost(Ghost $ghost):DiGraph
-    {
-        if ($ghost instanceof GhostGraph) {
-            $ghost->setDiGraph($this);
-        }
-        return $this->addNode($ghost);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function addLink(Link $link):DiGraph
-    {
-        return $this->addEdge($link);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getDependencyLinks(Ghost $ghost):array
-    {
-        $dependencies = [];
-        foreach($this->edges as $edge) {
-            if ($edge->getTail() !== $ghost) continue;
-            $dependencies[] = $edge;
-        }
-        return $dependencies;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function hasDependencyLinks(Ghost $ghost):bool
-    {
-        $dependencyEdge = $this->getDependencyLinks($ghost);
-        if (count($dependencyEdge) == 0) return false;
-        return true;
-    }
-
-
     /**
      * @inheritdoc
      */
-    public function getDependencyObjects(Ghost $ghost, $materializationCallback):array
+    public function getDependencies(Ghost $ghost, $materializationCallback):array
     {
         $dependencyObjects = [];
-        foreach($this->getDependencyLinks($ghost) as $edge) {
-            $dependencyNode = $edge->getHead();
-            if ($dependencyNode instanceof ValueGhost) {
-                $value = $dependencyNode->getObject();
+        foreach($this->getChildrenEdges($ghost) as $link) {
+            $value = $link->getHead();
+            if ($value instanceof Ghost) {
+                $value = call_user_func($materializationCallback,$value);
             }
-            else {
-                $value = call_user_func_array($materializationCallback,[$dependencyNode]);
-            }
-            if ($edge instanceof PropertyLink) {
-                $propertyName = $edge->getProperty();
-                $dependency = new PropertyDependency($propertyName,$value);
-            }
-            else {
-                $dependency = new Dependency($value);
-            }
-            $dependencyObjects[] = $dependency;
+            $link->setValue($value);
+            $dependencyObjects[] = $link;
         }
         return $dependencyObjects;
     }
@@ -92,21 +32,80 @@ class DefaultDiGraph extends AbstractGraph implements DiGraph
     /**
      * @inheritDoc
      */
-    public function getConstructorParams(Ghost $ghost, $materializationCallback):array
+    public function getConstructorDependencies(Ghost $ghost, $invocationCallback):array
     {
         $constructorParams = [];
-        foreach($this->getDependencyLinks($ghost) as $edge) {
-            if ( ! $edge instanceof ConstructorLink) continue;
-            $dependencyNode = $edge->getHead();
-            if ($dependencyNode instanceof ValueGhost) {
-                $value = $dependencyNode->getObject();
+        foreach($this->getChildrenEdges($ghost) as $link) {
+            if ( ! $link instanceof ConstructorLink) continue;
+            $param = $link->getHead();
+            if ($param instanceof Ghost) {
+                $param = call_user_func_array($invocationCallback,[$param]);
             }
-            else {
-                $value = call_user_func_array($materializationCallback,[$dependencyNode]);
-            }
-            $position = $edge->getPosition();
-            $constructorParams[$position] = $value;
+            $constructorParams[$link->getPosition()] = $param;
         }
         return $constructorParams;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getInjectableDependencies(Ghost $ghost, $invocationCallback):array
+    {
+        $injectableDependencies = [];
+        foreach($this->getChildrenEdges($ghost) as $link) {
+            if ($link instanceof ConstructorLink) continue;
+            $value = $link->getHead();
+            if ($value instanceof Ghost) {
+                $value = call_user_func($invocationCallback,$value);
+            }
+            $link->setValue($value);
+            $injectableDependencies[] = $link;
+        }
+        return $injectableDependencies;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasConstructorDependencies(Ghost $ghost):bool
+    {
+        foreach($this->getChildrenEdges($ghost) as $link) {
+            if ($link instanceof ConstructorLink) return true;
+        }
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasInjectableDependencies(Ghost $ghost):bool
+    {
+        foreach($this->getChildrenEdges($ghost) as $link) {
+            if ( ! $link instanceof ConstructorLink) return true;
+        }
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function addPropertyDependency(Ghost $ghost, $value, string $property):DiGraph
+    {
+        $link = new PropertyLink($ghost,$value);
+        $link->setPropertyName($property);
+        $this->addEdge($link,true);
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function addConstructorDependency(Ghost $ghost, $value, int $position):DiGraph
+    {
+        $link = new ConstructorLink($ghost,$value);
+        $link->setPosition($position);
+        $this->addEdge($link,true);
+        return $this;
+    }
+
 }

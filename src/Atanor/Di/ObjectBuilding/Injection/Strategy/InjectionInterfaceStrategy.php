@@ -17,7 +17,7 @@ class InjectionInterfaceStrategy implements InjectionStrategy
     /**
      * @inheritDoc
      */
-    public function canInject(&$instance,Dependency $dependency):bool
+    public function canInject(&$instance, Dependency $dependency):bool
     {
         foreach($this->getDependencyInterfaces($dependency->getValue()) as $interface) {
             $injectionInterfaceName = $interface . 'Aware';
@@ -29,7 +29,7 @@ class InjectionInterfaceStrategy implements InjectionStrategy
     /**
      * @inheritDoc
      */
-    public function inject(&$instance,Dependency $dependency)
+    public function inject(&$instance, Dependency $dependency)
     {
         if ( ! $this->canInject($instance,$dependency)) {
             throw new DependencyNotInjectable();

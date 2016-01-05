@@ -16,7 +16,7 @@ class BasicConstructor implements Constructor
      */
     public function construct(string $className, $options = null)
     {
-        return new $className;
+        return new $className();
     }
 
     /**

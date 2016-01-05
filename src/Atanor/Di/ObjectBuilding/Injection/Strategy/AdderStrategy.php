@@ -3,8 +3,8 @@ declare(strict_types = 1);
 namespace Atanor\Di\ObjectBuilding\Injection\Strategy;
 
 use Atanor\Di\ObjectBuilding\Injection\Dependency\Dependency;
-use Atanor\Di\ObjectBuilding\Injection\Dependency\PropertyDependency;
 use Atanor\Di\Exception\DependencyNotInjectable;
+use Atanor\Di\ObjectBuilding\Injection\Dependency\PropertyDependency;
 
 class AdderStrategy implements InjectionStrategy
 {
@@ -18,10 +18,10 @@ class AdderStrategy implements InjectionStrategy
     /**
      * @inheritDoc
      */
-    public function canInject(&$insatnce,Dependency $dependency):bool
+    public function canInject(&$instance, Dependency $dependency):bool
     {
         if ( ! $dependency instanceof PropertyDependency) return false;
-        $adderName = $this->getAdderName($insatnce,$dependency->getPropertyName());
+        $adderName = $this->getAdderName($instance,$dependency->getPropertyName());
         if (empty($adderName)) return false;
         return true;
     }
@@ -29,7 +29,7 @@ class AdderStrategy implements InjectionStrategy
     /**
      * @inheritDoc
      */
-    public function inject(&$instance,Dependency $dependency)
+    public function inject(&$instance, Dependency $dependency)
     {
         if ( ! $this->canInject($instance,$dependency)) {
             throw new DependencyNotInjectable();
